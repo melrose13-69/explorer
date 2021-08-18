@@ -98,9 +98,9 @@ const list = [
     {
         id: 2,
         type: 'file',
-        title: 'exportporta file',
+        title: 'file19',
         block: false,
-        created: '18.08.2021',
+        created: '18.08.2021'
     }
 ];
 // window.list = list;
@@ -117,20 +117,20 @@ const createMainList = ( parent = mainWrapper, array = list ) => {
         const type = document.createElement( 'ex-type' );
         const block = document.createElement( 'ex-block' );
 
-
         logo.textContent = item.title;
         line.setAttribute( 'data-id', item.id );
+        line.setAttribute( 'data-type', item.type );
         logo.classList.add( `icon-${item.type}` );
 
         date.textContent = item.created;
         type.textContent = item.type;
-        block.classList.add(`icon-${item.block === true ? 'lock' : 'lock-open'}`);
+        block.classList.add( `icon-${item.block === true ? 'lock' : 'lock-open'}` );
 
-        info.append(date, type, block);
+        info.append( date, type, block );
 
-        line.appendChild(logo);
-        line.appendChild(info);
-        parent.appendChild(line);
+        line.appendChild( logo );
+        line.appendChild( info );
+        parent.appendChild( line );
         if ( item.children ) {
             createMainList( parent, item.children );
         }
@@ -138,6 +138,7 @@ const createMainList = ( parent = mainWrapper, array = list ) => {
 //    <ex-line><ex-logo class="icon-folder">Folder1</ex-logo>
 // <ex-info><ex-date>02.03.2021</ex-date><ex-type>folder</ex-type><ex-block class="icon-lock"></ex-block></ex-info></ex-line>
 };
+
 const createAsideList = ( parent = asideWrapper, array = list ) => {
     // parent.innerHTML = ``;
     array.forEach( item => {
@@ -147,7 +148,6 @@ const createAsideList = ( parent = asideWrapper, array = list ) => {
         const logo = document.createElement( 'ex-logo' );
         const name = document.createElement( 'ex-name' );
         const content = document.createElement( 'ex-content' );
-
 
         name.textContent = item.title;
         info.setAttribute( 'data-id', item.id );
@@ -170,32 +170,43 @@ const createAsideList = ( parent = asideWrapper, array = list ) => {
     } );
 };
 
-createAsideList();
-createMainList();
 // // sort explorer folder-first and alphabet order
-// const sortExplorer = ( array = list ) => {
-//     array.map( item => {
-//         if ( item.children && item.children.length > 1 ) {
-//             item.children.sort( ( a, b ) => {
-//                 if ( a.title < b.title ) return -1;
-//                 if ( a.title > b.title ) return 1;
-//                 return 0;
-//             } ).sort( ( a, b ) => {
-//                 if ( b.type === 'folder' ) return 1;
-//                 if ( a.type === 'folder' ) return -1;
-//                 return 0;
-//             } );
-//             sortExplorer( item.children );
-//         }
-//     } );
-// };
+const sortExplorer = ( array = list ) => {
+    array.map( item => {
+        if ( item.children && item.children.length > 1 ) {
+            item.children.sort( ( a, b ) => {
+                if ( a.title < b.title ) return -1;
+                if ( a.title > b.title ) return 1;
+                return 0;
+            } ).sort( ( a, b ) => {
+                if ( b.type === 'folder' ) return 1;
+                if ( a.type === 'folder' ) return -1;
+                return 0;
+            } );
+            sortExplorer( item.children );
+        }
+    } );
+};
+
+const sortMain = ( ) => {
+    var elements = [].slice.call(document.querySelector('.ex-content__inner-body').childNodes);
+    elements.sort( ( a, b ) => {
+        if ( b.getAttribute('data-type') === 'folder' ) return 1;
+        if ( a.getAttribute('data-type') === 'folder' ) return -1;
+        return 0;
+    } );
+
+    createMainList()
+};
 //
 // // recreate a new list after change in list[]
-// const refreshExplorerContent = () => {
-//     sortExplorer( list );
-//     createAsideList();
-// };
-// refreshExplorerContent();
+const refreshExplorerContent = () => {
+    createMainList();
+    sortExplorer( list );
+    createAsideList();
+    sortMain();
+};
+refreshExplorerContent();
 // // return {element, array, index} of the element id
 // const returnElemArrayIndexOfTheElementId = ( elemId ) => {
 //     let currentElement = {};
@@ -349,8 +360,8 @@ asideWrapper.addEventListener( 'click', e => {
     const parent = target.parentNode;
     // open folder
     console.log( target.tagName );
-    if ( target.tagName === 'EX-INFO' && target.getAttribute('data-type') === 'folder' ) {
-        target.nextElementSibling.classList.toggle('open');
+    if ( target.tagName === 'EX-INFO' && target.getAttribute( 'data-type' ) === 'folder' ) {
+        target.nextElementSibling.classList.toggle( 'open' );
     }
     // refactor items
     // if ( parent.classList.contains( 'refactor-asideWrapper' ) ) {

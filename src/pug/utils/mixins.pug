@@ -44,14 +44,6 @@ mixin aside
 
 
 
-mixin contentLine(className, name, date, status)
-    ex-line
-        ex-logo(class='icon-' + className)= name
-        ex-info
-            ex-date= date
-            ex-type= className
-            ex-block(class='icon-' + status)
-
 
 mixin explorerContent
     .ex-content
@@ -63,21 +55,5 @@ mixin explorerContent
                     div Type
                     div Block status
             .ex-content__inner-body#main_wrapper
-                //+contentLine('folder', 'Folder1', '02.03.2021', 'lock')
-                //+contentLine('file', 'File1', '02.03.2021', 'lock')
-                //+contentLine('folder', 'Folder2', '02.03.2021', 'lock')
-                //+contentLine('folder', 'Folder3', '02.03.2021', 'lock-open')
-                //+contentLine('folder', 'Folder4', '02.03.2021', 'lock')
-                //+contentLine('file', 'File2', '02.03.2021', 'lock')
-                //+contentLine('file', 'File3', '02.03.2021', 'lock-open')
-                //+contentLine('file', 'File4', '02.03.2021', 'lock')
-                //+contentLine('folder', 'Folder5', '02.03.2021', 'lock')
-                //+contentLine('folder', 'Folder6', '02.03.2021', 'lock')
-                //+contentLine('folder', 'Folder7', '02.03.2021', 'lock-open')
-                //+contentLine('file', 'File5', '02.03.2021', 'lock')
-                //+contentLine('folder', 'Folder8', '02.03.2021', 'lock-open')
-                //+contentLine('file', 'File6', '02.03.2021', 'lock-open')
-                //+contentLine('folder', 'Folder9', '02.03.2021', 'lock-open')
-                //+contentLine('file', 'File7', '02.03.2021', 'lock-open')
 
 
