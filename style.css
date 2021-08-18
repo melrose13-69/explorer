@@ -78,7 +78,7 @@ li {
 	position: relative;
 	width: max-content;
 }
-/*.title:hover controls-wrapper {*/
+/*.title:hover controls-asideWrapper {*/
 	/*display: flex;*/
 /*}*/
 .folder__settings {
@@ -193,7 +193,7 @@ controls-wrapper *:hover {
 	background-color: #FFF;
 	display: flex;
 }
-/*controls-wrapper input {*/
+/*controls-asideWrapper input {*/
 	/*opacity: 0;*/
 	/*cursor: default;*/
 	/*border: none;*/
@@ -201,10 +201,10 @@ controls-wrapper *:hover {
 	/*height: 100%;*/
 	/*font-size: 20px;*/
 /*}*/
-/*controls-wrapper input.visible {*/
+/*controls-asideWrapper input.visible {*/
 	/*opacity: 1;*/
 /*}*/
 
-/*controls-wrapper accept {*/
+/*controls-asideWrapper accept {*/
 	/*display: none;*/
 /*}*/

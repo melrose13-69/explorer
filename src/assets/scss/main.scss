@@ -10,7 +10,7 @@ html {
 	color: $mainFontColor;
   height: 100%;
   @media screen and (max-width: $desktopWidth) {
-		font-size: 16px;
+		font-size: 18px;
   }
   @media screen and (max-width: $tableWidth) {
 		font-size: 15px;
@@ -28,6 +28,7 @@ body {
   font-weight: $mainFontWeight;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: $background;
 }
 
 *, *:before, *:after { box-sizing: border-box; }
@@ -61,14 +62,18 @@ section, .section {
   flex-direction: column;
   margin: 0 auto;
   min-height: 100vh;
+  max-height: 100vh;
 }
 
 .content-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  //min-height: 100vh;
 }
-
+.content {
+  display: flex;
+  justify-content: space-between;
+}
 .container {
   width: 100%;
   flex: 0 0 auto;
@@ -76,15 +81,19 @@ section, .section {
   margin: 0 auto;
   max-width: $desktopWidth;
   @media screen and (max-width: $smDesktopWidth) {
-    max-width: tableWidth;
+    max-width: $tableWidth;
   }
   @media screen and (max-width: $tableWidth) {
-    max-width: phoneWidth;
+    max-width: $phoneWidth;
   }
   @media screen and (max-width: $phoneWidth) {
-    max-width: smPhoneWidth;
+    max-width: $smPhoneWidth;
   }
 }
 
 // Modules
 // @import "modules/my-module.scss";
+@import './modules/header';
+@import './modules/constrols';
+@import './modules/aside';
+@import './modules/explorerContent';

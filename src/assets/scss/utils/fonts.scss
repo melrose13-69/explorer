@@ -1,2 +1,158 @@
 // Fonts here
 // see more: https://github.com/vedees/webpack-template/blob/master/README.md#import-js-files
+
+/* zen-dots-regular - latin */
+@font-face {
+  font-family: 'Zen Dots';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/zen-dots-v1-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+  url('../fonts/zen-dots-v1-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('../fonts/zen-dots-v1-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+  url('../fonts/zen-dots-v1-latin-regular.woff') format('woff'), /* Modern Browsers */
+  url('../fonts/zen-dots-v1-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+  url('../fonts/zen-dots-v1-latin-regular.svg#ZenDots') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'icomoon';
+  src:  url('../fonts/icomoon.eot?pcbeiq');
+  src:  url('../fonts/icomoon.eot?pcbeiq#iefix') format('embedded-opentype'),
+  url('../fonts/icomoon.ttf?pcbeiq') format('truetype'),
+  url('../fonts/icomoon.woff?pcbeiq') format('woff'),
+  url('../fonts/icomoon.svg?pcbeiq#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"]::before, [class*=" icon-"]::before {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon', sans-serif !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.icon-lock-open:before {
+  content: "\e90c";
+  color: #03c203 !important;
+}
+.icon-lock:before {
+  content: "\e90d";
+  color: #ff6969 !important;
+}
+.icon-file:before {
+  content: "\e90b";
+}
+.icon-home:before {
+  content: "\e900";
+}
+.icon-pen-alt-fill:before {
+  content: "\e901";
+}
+.icon-write:before {
+  content: "\e901";
+}
+.icon-blog:before {
+  content: "\e901";
+}
+.icon-minus:before {
+  content: "\e902";
+}
+.icon-remove:before {
+  content: "\e902";
+}
+.icon-delete:before {
+  content: "\e902";
+}
+.icon-plus:before {
+  content: "\e903";
+}
+.icon-add:before {
+  content: "\e903";
+}
+.icon-checkmark:before {
+  content: "\e904";
+}
+.icon-tick:before {
+  content: "\e904";
+}
+.icon-correct:before {
+  content: "\e904";
+}
+.icon-accept:before {
+  content: "\e904";
+}
+.icon-ok:before {
+  content: "\e904";
+}
+.icon-move-down:before {
+  content: "\e905";
+}
+.icon-sort:before {
+  content: "\e905";
+}
+.icon-arrange:before {
+  content: "\e905";
+}
+.icon-move-up:before {
+  content: "\e906";
+}
+.icon-sort1:before {
+  content: "\e906";
+}
+.icon-arrange1:before {
+  content: "\e906";
+}
+.icon-bin:before {
+  content: "\e907";
+}
+.icon-trashcan:before {
+  content: "\e907";
+}
+.icon-remove1:before {
+  content: "\e907";
+}
+.icon-delete1:before {
+  content: "\e907";
+}
+.icon-recycle:before {
+  content: "\e907";
+}
+.icon-dispose:before {
+  content: "\e907";
+}
+.icon-folder-open:before {
+  content: "\e908";
+}
+.icon-directory:before {
+  content: "\e908";
+}
+.icon-category:before {
+  content: "\e908";
+}
+.icon-browse:before {
+  content: "\e908";
+}
+.icon-folder:before {
+  content: "\e909";
+}
+.icon-directory1:before {
+  content: "\e909";
+}
+.icon-category1:before {
+  content: "\e909";
+}
+.icon-browse1:before {
+  content: "\e909";
+}

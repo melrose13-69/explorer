@@ -1,5 +1,5 @@
 // // global variables
-// const wrapper = document.querySelector( '.wrapper' );
+// const asideWrapper = document.querySelector( '.asideWrapper' );
 // const contextMenu = document.querySelector( 'context-menu' );
 //
 // // data[]
@@ -72,7 +72,7 @@
 // ];
 // window.list = list;
 // // create explorer from list[]
-// const createList = ( parent = wrapper, array = list ) => {
+// const createAsideList = ( parent = asideWrapper, array = list ) => {
 //     parent.innerHTML = ``;
 //     array.forEach( function ( o ) {
 //         const li = document.createElement( 'li' ),
@@ -98,7 +98,7 @@
 //             span.classList.add( 'arrow' );
 //             li.appendChild( span );
 //             li.appendChild( ul );
-//             createList( ul, o.children );
+//             createAsideList( ul, o.children );
 //         }
 //     } );
 // };
@@ -123,7 +123,7 @@
 // // recreate a new list after change in list[]
 // const refreshExplorerContent = () => {
 //     sortExplorer( list );
-//     createList();
+//     createAsideList();
 // };
 // refreshExplorerContent();
 // // return {element, array, index} of the element id
@@ -186,7 +186,7 @@
 //
 // // just 1 edit-mode class on page
 // const toggleEditModeClass = ( currentElem ) => {
-//     wrapper.querySelectorAll( '.edit-mode' ).forEach( elem => {
+//     asideWrapper.querySelectorAll( '.edit-mode' ).forEach( elem => {
 //         elem.classList.remove( 'edit-mode' );
 //     } );
 //
@@ -211,35 +211,35 @@
 // };
 // // create refactor block (rename element, add new folder or file)
 // const createRefactorBlock = ( container, value, typeOfCreateElement ) => {
-//     const wrapper = document.createElement( 'div' );
+//     const asideWrapper = document.createElement( 'div' );
 //     const input = document.createElement( 'input' );
 //     const btnSave = document.createElement( 'button' );
 //     const btnCancel = document.createElement( 'button' );
 //
 //
-//     if ( typeOfCreateElement === 'rename-wrapper' ) {
+//     if ( typeOfCreateElement === 'rename-asideWrapper' ) {
 //         input.value = value.trim();
 //     }
-//     if ( typeOfCreateElement === 'create-wrapper' ) {
-//         wrapper.setAttribute( 'data-type', value.toLowerCase() );
+//     if ( typeOfCreateElement === 'create-asideWrapper' ) {
+//         asideWrapper.setAttribute( 'data-type', value.toLowerCase() );
 //     }
 //     btnSave.innerText = 'Save';
 //     btnCancel.innerText = 'Cancel';
 //     btnSave.classList.add( `save-${ typeOfCreateElement }-mode` );
 //     btnCancel.classList.add( `cancel-mode` );
 //
-//     wrapper.classList.add( typeOfCreateElement, 'refactor-wrapper' );
+//     asideWrapper.classList.add( typeOfCreateElement, 'refactor-asideWrapper' );
 //
-//     wrapper.appendChild( input );
-//     wrapper.appendChild( btnSave );
-//     wrapper.appendChild( btnCancel );
-//     container.prepend( wrapper );
+//     asideWrapper.appendChild( input );
+//     asideWrapper.appendChild( btnSave );
+//     asideWrapper.appendChild( btnCancel );
+//     container.prepend( asideWrapper );
 //
 //     input.focus();
 // };
 // // remove refactor block
 // const removeRefactorBlock = () => {
-//     wrapper.querySelectorAll( '.refactor-wrapper' ).forEach( block => {
+//     asideWrapper.querySelectorAll( '.refactor-asideWrapper' ).forEach( block => {
 //         block.parentNode.removeChild( block );
 //     } );
 // };
@@ -269,12 +269,12 @@
 //
 // // close context menu
 // const destroyContextMenu = () => {
-//     wrapper.removeEventListener( 'contextmenu', () => {} );
+//     asideWrapper.removeEventListener( 'contextmenu', () => {} );
 //     contextMenu.style.display = 'none';
 // };
 //
-// // wrapper click (main parent of elements)
-// wrapper.addEventListener( 'click', e => {
+// // asideWrapper click (main parent of elements)
+// asideWrapper.addEventListener( 'click', e => {
 //     const target = e.target;
 //     const parent = target.parentNode;
 //     // open folder
@@ -283,16 +283,16 @@
 //         parent.classList.toggle( 'open' );
 //     }
 //     // refactor items
-//     if ( parent.classList.contains( 'refactor-wrapper' ) ) {
-//         const elementId = wrapper.querySelector( '.edit-mode' ).getAttribute( 'data-id' );
+//     if ( parent.classList.contains( 'refactor-asideWrapper' ) ) {
+//         const elementId = asideWrapper.querySelector( '.edit-mode' ).getAttribute( 'data-id' );
 //         const inputWithNewTitle = parent.querySelector( 'input' );
 //         const newTitle = inputWithNewTitle.value.trim();
 //         // save new title
-//         if ( target.classList.contains( 'save-rename-wrapper-mode' ) ) {
+//         if ( target.classList.contains( 'save-rename-asideWrapper-mode' ) ) {
 //             changeElementTitle( elementId, newTitle );
 //         }
 //         // save new folder or file
-//         if ( target.classList.contains( 'save-create-wrapper-mode' ) ) {
+//         if ( target.classList.contains( 'save-create-asideWrapper-mode' ) ) {
 //             const elementType = parent.getAttribute( 'data-type' );
 //
 //             if ( elementType === 'file' && newTitle.indexOf( '.' ) < 0 ) {
@@ -313,14 +313,14 @@
 // contextMenu.addEventListener( 'click', ( e ) => {
 //     const target = e.target;
 //     const tagName = target.tagName;
-//     const editElement = wrapper.querySelector( '.edit-mode' );
+//     const editElement = asideWrapper.querySelector( '.edit-mode' );
 //     const elementId = editElement.getAttribute( 'data-id' );
 //     const wrapperForRename = editElement.querySelector( '.title' );
 //     const wrapperForAdding = editElement.querySelector( 'ul' );
 //
 //     // rename file or folder
 //     if ( tagName === 'RENAME' ) {
-//         createRefactorBlock( wrapperForRename, wrapperForRename.innerText, 'rename-wrapper' );
+//         createRefactorBlock( wrapperForRename, wrapperForRename.innerText, 'rename-asideWrapper' );
 //     }
 //     // delete file or folder
 //     if ( tagName === 'DELETE' ) {
@@ -333,7 +333,7 @@
 //     // add new file or folder
 //     if ( tagName === 'FILE' || tagName === 'FOLDER' ) {
 //         removeRefactorBlock();
-//         createRefactorBlock( wrapperForAdding, tagName, 'create-wrapper' );
+//         createRefactorBlock( wrapperForAdding, tagName, 'create-asideWrapper' );
 //     }
 // } );
 //
@@ -350,7 +350,7 @@
 // } );
 //
 // // add custom context menu
-// wrapper.addEventListener( 'contextmenu', e => {
+// asideWrapper.addEventListener( 'contextmenu', e => {
 //     const target = e.target;
 //     e.preventDefault();
 //

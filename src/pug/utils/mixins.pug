@@ -1,4 +1,83 @@
-mixin item(title, descr)
-  .item
-    h2.item-title= title
-    p.item-descr= descr
+
+mixin controlBtn(type, className, text)
+    control-btn(type=type class='icon-' + className)= text
+
+mixin controls
+    controls-wrapper
+        +controlBtn('file', 'plus', 'File')
+        +controlBtn('folder', 'plus', 'Folder')
+        +controlBtn('edit', 'write', 'Edit')
+        +controlBtn('delete', 'bin', 'Delete')
+        +controlBtn('password', 'lock', 'Password protect')
+        //+controlBtn('refresh', '', 'Refresh')
+
+
+
+mixin aside
+    aside.aside
+        .aside__search
+            .aside__search-logo
+                span
+            .aside__search-input
+                input(type='text')
+            .aside__search-btn
+                button Search
+
+        .aside__explorer
+            .aside__explorer-inner#aside_wrapper
+                //ex-folder
+                //    ex-info
+                //        ex-logo
+                //        ex-name folder 1
+                //    ex-folder
+                //        ex-info
+                //            ex-logo
+                //            ex-name folder 2
+                //        ex-file
+                //            ex-info
+                //                ex-logo
+                //                ex-name file 1
+                //    ex-file
+                //        ex-info
+                //            ex-logo
+                //            ex-name file 2
+
+
+
+mixin contentLine(className, name, date, status)
+    ex-line
+        ex-logo(class='icon-' + className)= name
+        ex-info
+            ex-date= date
+            ex-type= className
+            ex-block(class='icon-' + status)
+
+
+mixin explorerContent
+    .ex-content
+        .ex-content__inner
+            .ex-content__inner-header
+                div.first Name
+                div.last
+                    div Created at
+                    div Type
+                    div Block status
+            .ex-content__inner-body#main_wrapper
+                //+contentLine('folder', 'Folder1', '02.03.2021', 'lock')
+                //+contentLine('file', 'File1', '02.03.2021', 'lock')
+                //+contentLine('folder', 'Folder2', '02.03.2021', 'lock')
+                //+contentLine('folder', 'Folder3', '02.03.2021', 'lock-open')
+                //+contentLine('folder', 'Folder4', '02.03.2021', 'lock')
+                //+contentLine('file', 'File2', '02.03.2021', 'lock')
+                //+contentLine('file', 'File3', '02.03.2021', 'lock-open')
+                //+contentLine('file', 'File4', '02.03.2021', 'lock')
+                //+contentLine('folder', 'Folder5', '02.03.2021', 'lock')
+                //+contentLine('folder', 'Folder6', '02.03.2021', 'lock')
+                //+contentLine('folder', 'Folder7', '02.03.2021', 'lock-open')
+                //+contentLine('file', 'File5', '02.03.2021', 'lock')
+                //+contentLine('folder', 'Folder8', '02.03.2021', 'lock-open')
+                //+contentLine('file', 'File6', '02.03.2021', 'lock-open')
+                //+contentLine('folder', 'Folder9', '02.03.2021', 'lock-open')
+                //+contentLine('file', 'File7', '02.03.2021', 'lock-open')
+
+
