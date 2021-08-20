@@ -1,0 +1,46 @@
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  background: $background;
+  padding: rem(40) rem(60);
+  border-radius: rem(20);
+  display: none;
+  &.active {
+    display: block;
+  }
+  &__inner {
+    &-text {
+      margin-bottom: rem(20);
+    }
+    &-input {
+      margin-bottom: rem(20);
+      input {
+        width: 100%;
+        height: rem(40);
+        border-radius: rem(10);
+        padding-left: rem(20);
+      }
+    }
+    &-btn {
+      display: flex;
+      justify-content: flex-end;
+      margin: 0 rem(-10);
+      div {
+        border: 2px solid $element1;
+        padding: rem(5) rem(10);
+        cursor: pointer;
+        background: transparent;
+        transition: all .4s;
+        margin: 0 rem(10);
+        &:hover {
+          background: $element1;
+          color: #fff;
+          transition: all .4s;
+        }
+      }
+    }
+  }
+}

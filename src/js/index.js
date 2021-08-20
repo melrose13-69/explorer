@@ -2,10 +2,12 @@
 // see more: https://github.com/vedees/webpack-template/blob/master/README.md#import-js-files
 
 // // global variables
-const asideWrapper = document.querySelector( '#aside_wrapper' );
-const mainWrapper = document.querySelector( '#main_wrapper' );
-const controlsWrapper = document.querySelector( 'controls-wrapper' );
+const body = document.body;
+const asideWrapper = body.querySelector( '#aside_wrapper' );
+const mainWrapper = body.querySelector( '#main_wrapper' );
+const controlsWrapper = body.querySelector( 'controls-wrapper' );
 const controlButtons = controlsWrapper.querySelectorAll( 'control-btn' );
+const modalBlock = body.querySelector( 'ex-modal' );
 // const contextMenu = document.querySelector( 'context-menu' );
 //
 // // data[]
@@ -107,7 +109,13 @@ const list = [
 ];
 // helpers
 const _ = ( tag ) => document.createElement( tag );
-const attr = ( elem, attr ) => elem.getAttribute( attr );
+const attr = ( elem, attr1, attr2 ) => {
+    if ( attr2 ) {
+        elem.setAttribute( attr1, attr2 );
+        return;
+    }
+    return elem.getAttribute( attr1 );
+};
 const siblings = ( parent ) => {
     const siblings = [];
     parent.childNodes.forEach( elem => {
@@ -119,6 +127,95 @@ const siblings = ( parent ) => {
 };
 
 // functions
+// modalBlock
+
+const modalHandle = ( action, id, name ) => {
+    const modalText = modalBlock.querySelector( '#ex-text' );
+    const modalInput = modalBlock.querySelector( '#first-input' );
+    const hiddenInput = modalBlock.querySelector( '#second-input' );
+    const saveButton = modalBlock.querySelector( '#ex-save' );
+    const isFile = action === 'file';
+    const isFolder = action === 'folder';
+    const isEdit = action === 'edit';
+    const isBlock = action === 'block';
+    const isDelete = action === 'delete';
+
+    const open = () => {
+
+        if ( isFolder || isFile ) {
+            modalText.innerText = `Write a new ${action} name`;
+        }
+
+        if ( isBlock ) {
+            modalText.innerText = `Do you really wont put a password ?`;
+            attr( modalInput, 'type', 'password' );
+            attr( hiddenInput, 'type', 'password' );
+        }
+        if ( isDelete ) {
+            modalText.innerText = `Do you really wont to delete ?`;
+            attr( modalInput, 'type', 'hidden' );
+            attr( hiddenInput, 'type', 'hidden' );
+        }
+        if ( isEdit ) {
+            modalText.innerText = `Do you really wont to rename this ${action} ?`;
+            modalInput.value = name;
+        }
+
+        modalBlock.classList.add( 'active' );
+        body.classList.add( 'lock' );
+        attr( saveButton, 'data-type', action );
+        attr( saveButton, 'data-id', id );
+    };
+
+    const validateModal = () => {
+        const valFirst = modalInput.value;
+        const isError = ( input ) => {input.classList.add( 'error' );};
+
+        if ( valFirst.length === 0 ) {
+            isError( modalInput );
+            return false;
+        }
+
+        if ( isFile ) {
+            if ( valFirst.indexOf( '.' ) < 0 ) {
+                isError( modalInput );
+                return false;
+            }
+
+            if ( valFirst[ valFirst.indexOf( '.' ) + 1 ] !== undefined ) {
+                return true;
+            } else {
+                isError( modalInput );
+                return false;
+            }
+        }
+
+        if ( isFolder ) {
+            if ( valFirst.indexOf( '.' ) > 0 ) {
+                isError( modalInput );
+                return false;
+            } else {
+                return true;
+            }
+        }
+    };
+// close modalBlock
+    const close = () => {
+        modalBlock.classList.remove( 'active' );
+        modalInput.classList.remove( 'error' );
+        hiddenInput.classList.remove( 'error' );
+        body.classList.remove( 'active' );
+        attr( saveButton, 'type', 'hidden' );
+        attr( saveButton, 'type', 'text' );
+        body.classList.remove( 'lock' );
+        modalInput.value = '';
+        hiddenInput.value = '';
+    };
+
+    return { open, close, validateModal };
+};
+
+
 // disabled all control-menu
 const disableAllMenu = () => controlButtons.forEach( btn => {
     attr( btn, 'data-type' ) !== 'explorer-up' && btn.classList.add( 'disabled' );
@@ -268,7 +365,6 @@ const returnElemArrayIndexOfTheElementId = ( elemId ) => {
         return currentElement;
     }
 };
-
 
 // functional for explorer
 // // add new element in the list[]
@@ -460,21 +556,39 @@ controlsWrapper.addEventListener( 'click', ( e ) => {
         let id = attr( mainWrapper.children[ 0 ], 'data-id' );
         id = id.substring( 0, id.length - 2 );
         createMainList( id );
+        return;
     }
 
-    if ( attr( t, 'data-type' ) === 'file' ) {
-    }
-    if ( attr( t, 'data-type' ) === 'folder' ) {
-    }
-    if ( attr( t, 'data-type' ) === 'edit' ) {
+    const activeElement = mainWrapper.querySelector( 'ex-line.target' );
+    const isFFDP = attr( t, 'data-type' ) === 'file' || attr( t, 'data-type' ) === 'folder' || attr( t, 'data-type' ) === 'delete' || attr( t, 'data-type' ) === 'password';
+    const isEdit = attr( t, 'data-type' ) === 'edit';
 
+    if ( isFFDP ) {
+        modalHandle( attr( t, 'data-type' ), attr( activeElement, 'data-id' ) ).open();
     }
-    if ( attr( t, 'data-type' ) === 'delete' ) {
+
+    if ( isEdit ) {
+        const name = activeElement.querySelector( 'ex-logo' ).innerText;
+        modalHandle( attr( t, 'data-type' ), attr( activeElement, 'data-id' ), name ).open();
     }
-    if ( attr( t, 'data-type' ) === 'password' ) {
-    }
+
 } );
 
+modalBlock.querySelector( '#ex-cancel' ).addEventListener( 'click', modalHandle().close );
+
+modalBlock.querySelector( '#ex-save' ).addEventListener( 'click', function () {
+    const type = attr( this, 'data-type' );
+    const id = attr( this, 'data-id' );
+
+    if ( modalHandle( type ).validateModal() ) {
+        if ( type === 'file' || type === 'folder' ) {
+            const name = modalBlock.querySelector( '#first-input' ).value;
+            addNewElementInFolder( id, type, name );
+        }
+
+        modalHandle().close();
+    }
+} );
 //
 // // context menu click
 // contextMenu.addEventListener( 'click', ( e ) => {

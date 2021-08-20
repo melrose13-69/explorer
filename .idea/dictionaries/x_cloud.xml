@@ -5,6 +5,7 @@
       <w>contextmenu</w>
       <w>dblclick</w>
       <w>exportportal</w>
+      <w>ffdp</w>
       <w>filecreate</w>
       <w>foldercreate</w>
       <w>ondblclick</w>

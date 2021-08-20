@@ -13,7 +13,6 @@ mixin controls
         //+controlBtn('refresh', '', 'Refresh')
 
 
-
 mixin aside
     aside.aside
         .aside__search
@@ -26,24 +25,6 @@ mixin aside
 
         .aside__explorer
             .aside__explorer-inner#aside_wrapper
-                //ex-folder
-                //    ex-info
-                //        ex-logo
-                //        ex-name folder 1
-                //    ex-folder
-                //        ex-info
-                //            ex-logo
-                //            ex-name folder 2
-                //        ex-file
-                //            ex-info
-                //                ex-logo
-                //                ex-name file 1
-                //    ex-file
-                //        ex-info
-                //            ex-logo
-                //            ex-name file 2
-
-
 
 
 mixin explorerContent
@@ -56,5 +37,16 @@ mixin explorerContent
                     div Type
                     div Block status
             .ex-content__inner-body#main_wrapper
+
+mixin modal
+    ex-modal.modal
+        .modal__inner
+            .modal__inner-text#ex-text any text
+            .modal__inner-input
+                input(type='text' class='element-input' id='first-input')
+                input(type='hidden' class='element-input' id='second-input')
+            .modal__inner-btn
+                .modal__inner-btn-save#ex-save(data-type='' data-id='') Save
+                .modal__inner-btn-cancel#ex-cancel Cancel
 
 
