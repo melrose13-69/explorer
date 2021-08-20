@@ -4,6 +4,8 @@
 // // global variables
 const asideWrapper = document.querySelector( '#aside_wrapper' );
 const mainWrapper = document.querySelector( '#main_wrapper' );
+const controlsWrapper = document.querySelector( 'controls-wrapper' );
+const controlButtons = controlsWrapper.querySelectorAll( 'control-btn' );
 // const contextMenu = document.querySelector( 'context-menu' );
 //
 // // data[]
@@ -103,19 +105,71 @@ const list = [
         created: '18.08.2021'
     }
 ];
-// window.list = list;
-// // create explorer from list[]
+// helpers
+const _ = ( tag ) => document.createElement( tag );
+const attr = ( elem, attr ) => elem.getAttribute( attr );
+const siblings = ( parent ) => {
+    const siblings = [];
+    parent.childNodes.forEach( elem => {
+        siblings.push( elem );
+    } );
+    if ( siblings.length > 0 ) return siblings;
 
-const createMainList = ( parent = mainWrapper, array = list ) => {
+    return false;
+};
 
-    array.forEach( item => {
-        const line = document.createElement( 'ex-line' );
-        const logo = document.createElement( 'ex-logo' );
+// functions
+// disabled all control-menu
+const disableAllMenu = () => controlButtons.forEach( btn => {
+    attr( btn, 'data-type' ) !== 'explorer-up' && btn.classList.add( 'disabled' );
+} );
+// disabled control-menu with type of ex-line
+const typeOfDisableMenu = ( item ) => {
+    const type = item.getAttribute( 'data-type' );
 
-        const info = document.createElement( 'ex-info' );
-        const date = document.createElement( 'ex-date' );
-        const type = document.createElement( 'ex-type' );
-        const block = document.createElement( 'ex-block' );
+    controlButtons.forEach( btn => {
+        if ( type === 'folder' ) {
+            attr( btn, 'data-type' ) !== 'explorer-up' && btn.classList.remove( 'disabled' );
+        } else {
+            if ( attr( btn, 'data-type' ) !== 'explorer-up' ) {
+                attr( btn, 'data-for' ) === 'all'
+                    ? btn.classList.remove( 'disabled' )
+                    : btn.classList.add( 'disabled' );
+            }
+        }
+    } );
+};
+// create main explorer
+const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
+    const listFiles = [];
+    parent.innerHTML = '';
+    if ( elemId ) array = returnElemArrayIndexOfTheElementId( elemId ).element.children;
+
+    const pushMainList = () => {
+        array.forEach( elem => {
+            listFiles.push( elem );
+        } );
+
+        listFiles.sort( ( a, b ) => {
+            if ( a.title < b.title ) return -1;
+            if ( a.title > b.title ) return 1;
+            return 0;
+        } ).sort( ( a, b ) => {
+            if ( b.type === 'folder' ) return 1;
+            if ( a.type === 'folder' ) return -1;
+            return 0;
+        } );
+    };
+
+    pushMainList();
+
+    listFiles.forEach( item => {
+        const line = _( 'ex-line' );
+        const logo = _( 'ex-logo' );
+        const info = _( 'ex-info' );
+        const date = _( 'ex-date' );
+        const type = _( 'ex-type' );
+        const block = _( 'ex-block' );
 
         logo.textContent = item.title;
         line.setAttribute( 'data-id', item.id );
@@ -131,23 +185,43 @@ const createMainList = ( parent = mainWrapper, array = list ) => {
         line.appendChild( logo );
         line.appendChild( info );
         parent.appendChild( line );
-        if ( item.children ) {
-            createMainList( parent, item.children );
+        console.log( attr( line, 'data-id' ).length );
+        if ( attr( line, 'data-id' ).length === 1 ) {
+            controlsWrapper.querySelector( '[data-type="explorer-up"' ).classList.add( 'disabled' );
+        } else {
+            controlsWrapper.querySelector( '[data-type="explorer-up"' ).classList.remove( 'disabled' );
         }
+        disableAllMenu();
     } );
-//    <ex-line><ex-logo class="icon-folder">Folder1</ex-logo>
-// <ex-info><ex-date>02.03.2021</ex-date><ex-type>folder</ex-type><ex-block class="icon-lock"></ex-block></ex-info></ex-line>
 };
-
+// create aside explorer
 const createAsideList = ( parent = asideWrapper, array = list ) => {
-    // parent.innerHTML = ``;
+    parent.innerHTML = '';
+    const sortExplorer = ( array ) => {
+        array.map( item => {
+            if ( item.children && item.children.length > 1 ) {
+                item.children.sort( ( a, b ) => {
+                    if ( a.title < b.title ) return -1;
+                    if ( a.title > b.title ) return 1;
+                    return 0;
+                } ).sort( ( a, b ) => {
+                    if ( b.type === 'folder' ) return 1;
+                    if ( a.type === 'folder' ) return -1;
+                    return 0;
+                } );
+                sortExplorer( item.children );
+            }
+        } );
+    };
+    sortExplorer( array );
+
     array.forEach( item => {
-        const file = document.createElement( 'ex-file' );
-        const folder = document.createElement( 'ex-folder' );
-        const info = document.createElement( 'ex-info' );
-        const logo = document.createElement( 'ex-logo' );
-        const name = document.createElement( 'ex-name' );
-        const content = document.createElement( 'ex-content' );
+        const file = _( 'ex-file' );
+        const folder = _( 'ex-folder' );
+        const info = _( 'ex-info' );
+        const logo = _( 'ex-logo' );
+        const name = _( 'ex-name' );
+        const content = _( 'ex-content' );
 
         name.textContent = item.title;
         info.setAttribute( 'data-id', item.id );
@@ -169,100 +243,68 @@ const createAsideList = ( parent = asideWrapper, array = list ) => {
         }
     } );
 };
+createMainList();
+createAsideList();
+// return {element, array, index} of the element id
+const returnElemArrayIndexOfTheElementId = ( elemId ) => {
+    let currentElement = {};
 
-// // sort explorer folder-first and alphabet order
-const sortExplorer = ( array = list ) => {
-    array.map( item => {
-        if ( item.children && item.children.length > 1 ) {
-            item.children.sort( ( a, b ) => {
-                if ( a.title < b.title ) return -1;
-                if ( a.title > b.title ) return 1;
-                return 0;
-            } ).sort( ( a, b ) => {
-                if ( b.type === 'folder' ) return 1;
-                if ( a.type === 'folder' ) return -1;
-                return 0;
-            } );
-            sortExplorer( item.children );
-        }
-    } );
+    const searchParentByElementId = ( searchElemId, currentArray ) => {
+        currentArray.forEach( ( item, index, arr ) => {
+            if ( item.id === +elemId ) {
+                currentElement.element = item;
+                currentElement.array = arr;
+                currentElement.index = index;
+            }
+            if ( item.children && item.children.length > 0 ) {
+                searchParentByElementId( +elemId, item.children );
+            }
+        } );
+    };
+
+    searchParentByElementId( elemId, list );
+
+    if ( Object.keys( currentElement ).length > 0 ) {
+        return currentElement;
+    }
 };
 
-const sortMain = ( ) => {
-    var elements = [].slice.call(document.querySelector('.ex-content__inner-body').childNodes);
-    elements.sort( ( a, b ) => {
-        if ( b.getAttribute('data-type') === 'folder' ) return 1;
-        if ( a.getAttribute('data-type') === 'folder' ) return -1;
-        return 0;
-    } );
 
-    createMainList()
-};
-//
-// // recreate a new list after change in list[]
-const refreshExplorerContent = () => {
-    createMainList();
-    sortExplorer( list );
-    createAsideList();
-    sortMain();
-};
-refreshExplorerContent();
-// // return {element, array, index} of the element id
-// const returnElemArrayIndexOfTheElementId = ( elemId ) => {
-//     let currentElement = {};
-//
-//     const searchParentByElementId = ( searchElemId, currentArray ) => {
-//         currentArray.forEach( ( item, index, arr ) => {
-//             if ( item.id === elemId ) {
-//                 currentElement.element = item;
-//                 currentElement.array = arr;
-//                 currentElement.index = index;
-//             }
-//             if ( item.children && item.children.length > 0 ) {
-//                 searchParentByElementId( elemId, item.children );
-//             }
-//         } );
-//     };
-//
-//     searchParentByElementId( elemId, list );
-//
-//     if ( Object.keys( currentElement ).length > 0 ) {
-//         return currentElement;
-//     }
-// };
+// functional for explorer
 // // add new element in the list[]
-// const addIdToNewElement = folderFiles => {
-//     const allId = folderFiles.children.map( file => file.id );
-//     if ( allId.length === 0 ) {
-//         return +`${ folderFiles.id }1`;
-//     }
-//     return Math.max.apply( null, allId ) + 1;
-// };
+const addIdToNewElement = folderFiles => {
+    const allId = folderFiles.children.map( file => file.id );
+    if ( allId.length === 0 ) {
+        return +`${ folderFiles.id }1`;
+    }
+    return Math.max.apply( null, allId ) + 1;
+};
 // // change element title
 // const changeElementTitle = ( itemId, newTitle ) => {
 //     const currentItem = returnElemArrayIndexOfTheElementId( +itemId ).element;
 //     currentItem.title = newTitle;
-//     refreshExplorerContent();
+//     createAsideList();
 // };
 // // add new element in list[]
-// const addNewElementInFolder = ( folderId, typeOfNewElem, titleOfNewElem ) => {
-//     const newItem = new Object( null );
-//     const currentFolder = returnElemArrayIndexOfTheElementId( +folderId ).element;
-//     // required params
-//     newItem.id = addIdToNewElement( currentFolder );
-//     newItem.type = typeOfNewElem;
-//     newItem.title = titleOfNewElem;
-//     // if folder
-//     typeOfNewElem === 'folder' && (newItem.children = []);
-//     // add new file in folder
-//     currentFolder.children.push( newItem );
-//     refreshExplorerContent();
-// };
+const addNewElementInFolder = ( folderId, typeOfNewElem, titleOfNewElem ) => {
+    const newItem = {};
+    const currentFolder = returnElemArrayIndexOfTheElementId( +folderId ).element;
+    // required params
+    newItem.id = addIdToNewElement( currentFolder );
+    newItem.type = typeOfNewElem;
+    newItem.title = titleOfNewElem;
+    // if folder
+    typeOfNewElem === 'folder' && (newItem.children = []);
+    // add new file in folder
+    currentFolder.children.push( newItem );
+    createAsideList();
+    createMainList();
+};
 // // remove element from list[]
 // const removeElement = ( elemId, array = list ) => {
 //     const currentElement = returnElemArrayIndexOfTheElementId( +elemId );
 //     currentElement.array.splice( currentElement.index, 1 );
-//     refreshExplorerContent();
+//     createAsideList();
 // };
 //
 // // just 1 edit-mode class on page
@@ -389,6 +431,50 @@ asideWrapper.addEventListener( 'click', e => {
     // }
 
 } );
+
+mainWrapper.addEventListener( 'dblclick', ( e ) => {
+    const t = e.target;
+
+    if ( t.tagName === 'EX-LINE' ) {
+        if ( attr( t, 'data-type' ) === 'folder' ) {
+            createMainList( attr( t, 'data-id' ) );
+            disableAllMenu();
+        }
+    }
+} );
+mainWrapper.addEventListener( 'click', ( e ) => {
+    const t = e.target;
+
+    if ( t.tagName === 'EX-LINE' ) {
+        const childs = siblings( t.parentNode );
+        childs.forEach( el => el.classList.remove( 'target' ) );
+        t.classList.add( 'target' );
+        typeOfDisableMenu( t );
+    }
+} );
+
+controlsWrapper.addEventListener( 'click', ( e ) => {
+    const t = e.target;
+
+    if ( attr( t, 'data-type' ) === 'explorer-up' && !t.classList.contains( 'disabled' ) ) {
+        let id = attr( mainWrapper.children[ 0 ], 'data-id' );
+        id = id.substring( 0, id.length - 2 );
+        createMainList( id );
+    }
+
+    if ( attr( t, 'data-type' ) === 'file' ) {
+    }
+    if ( attr( t, 'data-type' ) === 'folder' ) {
+    }
+    if ( attr( t, 'data-type' ) === 'edit' ) {
+
+    }
+    if ( attr( t, 'data-type' ) === 'delete' ) {
+    }
+    if ( attr( t, 'data-type' ) === 'password' ) {
+    }
+} );
+
 //
 // // context menu click
 // contextMenu.addEventListener( 'click', ( e ) => {

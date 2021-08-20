@@ -1,14 +1,15 @@
 
-mixin controlBtn(type, className, text)
-    control-btn(type=type class='icon-' + className)= text
+mixin controlBtn(type, className, text, forElem)
+    control-btn(data-type=type class='icon-' + className data-for=forElem)= text
 
 mixin controls
     controls-wrapper
-        +controlBtn('file', 'plus', 'File')
-        +controlBtn('folder', 'plus', 'Folder')
-        +controlBtn('edit', 'write', 'Edit')
-        +controlBtn('delete', 'bin', 'Delete')
-        +controlBtn('password', 'lock', 'Password protect')
+        +controlBtn('explorer-up', 'sort1 disabled', 'Move up', '' )
+        +controlBtn('file', 'plus disabled', 'File', 'folder' )
+        +controlBtn('folder', 'plus disabled', 'Folder','folder' )
+        +controlBtn('edit', 'write disabled', 'Edit', 'all' )
+        +controlBtn('delete', 'bin disabled', 'Delete', 'all' )
+        +controlBtn('password', 'lock disabled', 'Password protect', 'folder' )
         //+controlBtn('refresh', '', 'Refresh')
 
 

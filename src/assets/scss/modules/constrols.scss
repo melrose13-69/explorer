@@ -18,15 +18,12 @@ controls-wrapper {
       transition: all .4s;
       color: $element2;
     }
-  }
-  &.disabled {
-    color: #5a667c;
-
-    control-btn {
+    &.disabled {
+      color: #74789a;
       cursor: default;
+      user-select: none;
       &:hover {
-        transition: all .4s;
-        color: #5a667c;
+        color: #74789a;
       }
     }
   }
