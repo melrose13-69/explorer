@@ -11,12 +11,15 @@ const modalBlock = body.querySelector( 'ex-modal' );
 // const contextMenu = document.querySelector( 'context-menu' );
 //
 // // data[]
+
+
 const list = [
     {
         id: 1,
         type: 'folder',
         title: 'exportportal',
         block: true,
+        password: '',
         created: '18.08.2021',
         children: [
             {
@@ -24,6 +27,7 @@ const list = [
                 type: 'file',
                 title: 'index.html',
                 block: false,
+                password: '',
                 created: '18.08.2021'
             },
             {
@@ -31,6 +35,7 @@ const list = [
                 type: 'folder',
                 title: 'css',
                 block: false,
+                password: '',
                 created: '18.08.2021',
                 children: [
                     {
@@ -38,6 +43,7 @@ const list = [
                         type: 'file',
                         title: 'style.css',
                         block: false,
+                        password: '',
                         created: '18.08.2021'
                     }
                 ]
@@ -47,6 +53,7 @@ const list = [
                 type: 'folder',
                 title: 'js',
                 block: false,
+                password: '',
                 created: '18.08.2021',
                 children: [
                     {
@@ -54,6 +61,7 @@ const list = [
                         type: 'file',
                         title: 'app.js',
                         block: false,
+                        password: '',
                         created: '18.08.2021'
                     },
                     {
@@ -61,6 +69,7 @@ const list = [
                         type: 'folder',
                         title: 'vendors',
                         block: false,
+                        password: '',
                         created: '18.08.2021',
                         children: [
                             {
@@ -68,6 +77,7 @@ const list = [
                                 type: 'file',
                                 title: 'swiper.js',
                                 block: false,
+                                password: '',
                                 created: '18.08.2021'
                             },
                             {
@@ -75,6 +85,7 @@ const list = [
                                 type: 'file',
                                 title: 'fancybox.js',
                                 block: false,
+                                password: '',
                                 created: '18.08.2021'
                             }
                         ]
@@ -85,14 +96,16 @@ const list = [
                 id: 14,
                 type: 'folder',
                 title: 'fonts',
-                block: true,
+                block: false,
+                password: '',
                 created: '18.08.2021',
                 children: [
                     {
                         id: 141,
                         type: 'file',
                         title: 'icomoon.svg',
-                        block: true,
+                        block: false,
+                        password: '',
                         created: '18.08.2021'
                     }
                 ]
@@ -104,10 +117,15 @@ const list = [
         type: 'file',
         title: 'file19',
         block: false,
+        password: '',
         created: '18.08.2021'
     }
 ];
 // helpers
+const getDate = () => {
+    const date = new Date();
+    return date.toLocaleDateString();
+};
 const _ = ( tag ) => document.createElement( tag );
 const attr = ( elem, attr1, attr2 ) => {
     if ( attr2 ) {
@@ -125,7 +143,7 @@ const siblings = ( parent ) => {
 
     return false;
 };
-
+const getTargetElement = () => document.querySelector('ex-line.target');
 // functions
 // modalBlock
 
@@ -138,26 +156,34 @@ const modalHandle = ( action, id, name ) => {
     const isFolder = action === 'folder';
     const isEdit = action === 'edit';
     const isBlock = action === 'block';
+    const isUnblock = action === 'unblock';
     const isDelete = action === 'delete';
 
     const open = () => {
 
         if ( isFolder || isFile ) {
-            modalText.innerText = `Write a new ${action} name`;
+            modalText.innerText = `Write a new ${ action } name`;
         }
 
-        if ( isBlock ) {
-            modalText.innerText = `Do you really wont put a password ?`;
+        if ( isBlock) {
+            modalText.innerText = `Enter the password to protect the folder`;
             attr( modalInput, 'type', 'password' );
             attr( hiddenInput, 'type', 'password' );
         }
+
+        if ( isUnblock ) {
+            modalText.innerText = `Enter the password to delete the folder`;
+            attr( modalInput, 'type', 'password' );
+            attr( hiddenInput, 'type', 'hidden' );
+        }
+
         if ( isDelete ) {
-            modalText.innerText = `Do you really wont to delete ?`;
+            modalText.innerText = `Do you really wont to delete folder ?`;
             attr( modalInput, 'type', 'hidden' );
             attr( hiddenInput, 'type', 'hidden' );
         }
         if ( isEdit ) {
-            modalText.innerText = `Do you really wont to rename this ${action} ?`;
+            modalText.innerText = `Do you really wont to rename this ${ action } ?`;
             modalInput.value = name;
         }
 
@@ -198,6 +224,9 @@ const modalHandle = ( action, id, name ) => {
                 return true;
             }
         }
+
+        if(isUnblock) {
+        }
     };
 // close modalBlock
     const close = () => {
@@ -218,19 +247,38 @@ const modalHandle = ( action, id, name ) => {
 // disabled all control-menu
 const disableAllMenu = () => controlButtons.forEach( btn => {
     attr( btn, 'data-type' ) !== 'explorer-up' && btn.classList.add( 'disabled' );
+    if(btn.classList.contains('password-protect')) {
+        btn.innerText = 'Password protect'
+    }
 } );
 // disabled control-menu with type of ex-line
-const typeOfDisableMenu = ( item ) => {
+const typeOfDisableMenu = ( item, blockStatus ) => {
     const type = item.getAttribute( 'data-type' );
 
     controlButtons.forEach( btn => {
         if ( type === 'folder' ) {
             attr( btn, 'data-type' ) !== 'explorer-up' && btn.classList.remove( 'disabled' );
+            if(blockStatus) {
+                if(btn.classList.contains('password-protect')) {
+                    attr(btn, 'data-type', 'unblock');
+                    btn.innerText = 'Unblock folder';
+                }
+            }else {
+                if(btn.classList.contains('password-protect')) {
+                    attr(btn, 'data-type', 'block');
+                    btn.innerText = 'Block folder';
+                }
+            }
         } else {
             if ( attr( btn, 'data-type' ) !== 'explorer-up' ) {
-                attr( btn, 'data-for' ) === 'all'
-                    ? btn.classList.remove( 'disabled' )
-                    : btn.classList.add( 'disabled' );
+                if(attr( btn, 'data-for' ) === 'all') {
+                    btn.classList.remove( 'disabled' );
+                } else {
+                    btn.classList.add( 'disabled' );
+                }
+            }
+            if(btn.classList.contains('password-protect')) {
+                btn.innerText = 'Password protect';
             }
         }
     } );
@@ -241,7 +289,7 @@ const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
     parent.innerHTML = '';
     if ( elemId ) array = returnElemArrayIndexOfTheElementId( elemId ).element.children;
 
-    const pushMainList = () => {
+    (function () {
         array.forEach( elem => {
             listFiles.push( elem );
         } );
@@ -255,10 +303,9 @@ const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
             if ( a.type === 'folder' ) return -1;
             return 0;
         } );
-    };
+    })();
 
-    pushMainList();
-
+    if(listFiles.length === 0) return
     listFiles.forEach( item => {
         const line = _( 'ex-line' );
         const logo = _( 'ex-logo' );
@@ -268,20 +315,23 @@ const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
         const block = _( 'ex-block' );
 
         logo.textContent = item.title;
-        line.setAttribute( 'data-id', item.id );
-        line.setAttribute( 'data-type', item.type );
-        logo.classList.add( `icon-${item.type}` );
+        attr( line, 'data-id', item.id );
+        attr( line, 'data-type', item.type );
+        logo.classList.add( `icon-${ item.type }` );
 
         date.textContent = item.created;
         type.textContent = item.type;
-        block.classList.add( `icon-${item.block === true ? 'lock' : 'lock-open'}` );
+        if(item.type === 'folder') {
+            block.classList.add( `icon-${ item.block === true ? 'lock' : 'lock-open' }` );
+            attr(line, 'data-block', item.block)
+        }
 
         info.append( date, type, block );
 
         line.appendChild( logo );
         line.appendChild( info );
         parent.appendChild( line );
-        console.log( attr( line, 'data-id' ).length );
+
         if ( attr( line, 'data-id' ).length === 1 ) {
             controlsWrapper.querySelector( '[data-type="explorer-up"' ).classList.add( 'disabled' );
         } else {
@@ -383,84 +433,36 @@ const addIdToNewElement = folderFiles => {
 // // add new element in list[]
 const addNewElementInFolder = ( folderId, typeOfNewElem, titleOfNewElem ) => {
     const newItem = {};
-    const currentFolder = returnElemArrayIndexOfTheElementId( +folderId ).element;
+    const currentFolder = returnElemArrayIndexOfTheElementId( folderId ).element;
     // required params
     newItem.id = addIdToNewElement( currentFolder );
     newItem.type = typeOfNewElem;
     newItem.title = titleOfNewElem;
+    newItem.created = getDate();
     // if folder
     typeOfNewElem === 'folder' && (newItem.children = []);
     // add new file in folder
     currentFolder.children.push( newItem );
     createAsideList();
-    createMainList();
+    createMainList( folderId );
 };
-// // remove element from list[]
-// const removeElement = ( elemId, array = list ) => {
-//     const currentElement = returnElemArrayIndexOfTheElementId( +elemId );
-//     currentElement.array.splice( currentElement.index, 1 );
-//     createAsideList();
-// };
-//
-// // just 1 edit-mode class on page
-// const toggleEditModeClass = ( currentElem ) => {
-//     asideWrapper.querySelectorAll( '.edit-mode' ).forEach( elem => {
-//         elem.classList.remove( 'edit-mode' );
-//     } );
-//
-//     if ( currentElem ) {
-//         currentElem.classList.add( 'edit-mode' );
-//     }
-// };
-// // create buttons YES and NO for delete confirmation
-// const createConfirmationBlock = ( container ) => {
-//     const yesBtn = document.createElement( 'button' );
-//     const noBtn = document.createElement( 'button' );
-//
-//     yesBtn.innerText = 'yes';
-//     yesBtn.classList.add( 'yes' );
-//     noBtn.innerText = 'no';
-//     noBtn.classList.add( 'no' );
-//     container.classList.add( 'confirm' );
-//     container.innerHTML = '';
-//
-//     container.appendChild( yesBtn );
-//     container.appendChild( noBtn );
-// };
-// // create refactor block (rename element, add new folder or file)
-// const createRefactorBlock = ( container, value, typeOfCreateElement ) => {
-//     const asideWrapper = document.createElement( 'div' );
-//     const input = document.createElement( 'input' );
-//     const btnSave = document.createElement( 'button' );
-//     const btnCancel = document.createElement( 'button' );
-//
-//
-//     if ( typeOfCreateElement === 'rename-asideWrapper' ) {
-//         input.value = value.trim();
-//     }
-//     if ( typeOfCreateElement === 'create-asideWrapper' ) {
-//         asideWrapper.setAttribute( 'data-type', value.toLowerCase() );
-//     }
-//     btnSave.innerText = 'Save';
-//     btnCancel.innerText = 'Cancel';
-//     btnSave.classList.add( `save-${ typeOfCreateElement }-mode` );
-//     btnCancel.classList.add( `cancel-mode` );
-//
-//     asideWrapper.classList.add( typeOfCreateElement, 'refactor-asideWrapper' );
-//
-//     asideWrapper.appendChild( input );
-//     asideWrapper.appendChild( btnSave );
-//     asideWrapper.appendChild( btnCancel );
-//     container.prepend( asideWrapper );
-//
-//     input.focus();
-// };
-// // remove refactor block
-// const removeRefactorBlock = () => {
-//     asideWrapper.querySelectorAll( '.refactor-asideWrapper' ).forEach( block => {
-//         block.parentNode.removeChild( block );
-//     } );
-// };
+// remove element from list[]
+const removeElement = ( elemId, array = list ) => {
+    const currentElement = returnElemArrayIndexOfTheElementId( elemId );
+    currentElement.array.splice( currentElement.index, 1 );
+    createAsideList();
+    createMainList();
+
+    modalHandle().close();
+};
+const blockFolder = (folderId, pass) => {
+    const currentElement = returnElemArrayIndexOfTheElementId(folderId).element;
+    const encoder = new TextEncoder();
+    currentElement.password = encoder.encode(pass);
+    currentElement.block = true
+}
+
+const unblockFolder = ()
 // // open context menu
 // const showContextMenu = ( target, yPos, xPos, type ) => {
 //     const elementParent = target.parentNode;
@@ -500,31 +502,6 @@ asideWrapper.addEventListener( 'click', e => {
     if ( target.tagName === 'EX-INFO' && target.getAttribute( 'data-type' ) === 'folder' ) {
         target.nextElementSibling.classList.toggle( 'open' );
     }
-    // refactor items
-    // if ( parent.classList.contains( 'refactor-asideWrapper' ) ) {
-    //     const elementId = asideWrapper.querySelector( '.edit-mode' ).getAttribute( 'data-id' );
-    //     const inputWithNewTitle = parent.querySelector( 'input' );
-    //     const newTitle = inputWithNewTitle.value.trim();
-    //     // save new title
-    //     if ( target.classList.contains( 'save-rename-asideWrapper-mode' ) ) {
-    //         changeElementTitle( elementId, newTitle );
-    //     }
-    //     // save new folder or file
-    //     if ( target.classList.contains( 'save-create-asideWrapper-mode' ) ) {
-    //         const elementType = parent.getAttribute( 'data-type' );
-    //
-    //         if ( elementType === 'file' && newTitle.indexOf( '.' ) < 0 ) {
-    //             inputWithNewTitle.style.border = '1px solid red';
-    //             return;
-    //         }
-    //
-    //         addNewElementInFolder( elementId, elementType, newTitle );
-    //     }
-    //     if ( target.classList.contains( 'cancel-mode' ) ) {
-    //         removeRefactorBlock();
-    //     }
-    // }
-
 } );
 
 mainWrapper.addEventListener( 'dblclick', ( e ) => {
@@ -542,9 +519,10 @@ mainWrapper.addEventListener( 'click', ( e ) => {
 
     if ( t.tagName === 'EX-LINE' ) {
         const childs = siblings( t.parentNode );
+        const blockStatus = attr(t, 'data-block');
         childs.forEach( el => el.classList.remove( 'target' ) );
         t.classList.add( 'target' );
-        typeOfDisableMenu( t );
+        typeOfDisableMenu( t, blockStatus );
     }
 } );
 
@@ -558,9 +536,15 @@ controlsWrapper.addEventListener( 'click', ( e ) => {
         return;
     }
 
-    const activeElement = mainWrapper.querySelector( 'ex-line.target' );
-    const isFFDP = attr( t, 'data-type' ) === 'file' || attr( t, 'data-type' ) === 'folder' || attr( t, 'data-type' ) === 'delete' || attr( t, 'data-type' ) === 'password';
+    const activeElement = getTargetElement();
+    const isFFDP = attr( t, 'data-type' ) === 'file'
+        || attr( t, 'data-type' ) === 'folder'
+        || attr( t, 'data-type' ) === 'delete'
+        || attr( t, 'data-type' ) === 'block'
+        || attr( t, 'data-type' ) === 'unblock';
     const isEdit = attr( t, 'data-type' ) === 'edit';
+    const isDelete = attr( t, 'data-type' ) === 'delete';
+
 
     if ( isFFDP ) {
         modalHandle( attr( t, 'data-type' ), attr( activeElement, 'data-id' ) ).open();
@@ -570,7 +554,6 @@ controlsWrapper.addEventListener( 'click', ( e ) => {
         const name = activeElement.querySelector( 'ex-logo' ).innerText;
         modalHandle( attr( t, 'data-type' ), attr( activeElement, 'data-id' ), name ).open();
     }
-
 } );
 
 modalBlock.querySelector( '#ex-cancel' ).addEventListener( 'click', modalHandle().close );
@@ -578,15 +561,24 @@ modalBlock.querySelector( '#ex-cancel' ).addEventListener( 'click', modalHandle(
 modalBlock.querySelector( '#ex-save' ).addEventListener( 'click', function () {
     const type = attr( this, 'data-type' );
     const id = attr( this, 'data-id' );
-
-    if ( modalHandle( type ).validateModal() ) {
-        if ( type === 'file' || type === 'folder' ) {
+    if ( type === 'file' || type === 'folder' ) {
+        if ( modalHandle( type ).validateModal() ) {
             const name = modalBlock.querySelector( '#first-input' ).value;
             addNewElementInFolder( id, type, name );
-        }
 
+            modalHandle().close();
+        }
+    }
+    if(type === 'delete') {
+        removeElement(id);
+    }
+
+    if(type === 'block') {
+        const pass = modalBlock.querySelector('#first-input').value;
+        blockFolder(id, pass);
         modalHandle().close();
     }
+
 } );
 //
 // // context menu click

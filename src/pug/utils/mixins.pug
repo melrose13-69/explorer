@@ -9,7 +9,7 @@ mixin controls
         +controlBtn('folder', 'plus disabled', 'Folder','folder' )
         +controlBtn('edit', 'write disabled', 'Edit', 'all' )
         +controlBtn('delete', 'bin disabled', 'Delete', 'all' )
-        +controlBtn('password', 'lock disabled', 'Password protect', 'folder' )
+        control-btn(data-type='block' class='icon-lock password-protect' data-for='folder') Password protect
         //+controlBtn('refresh', '', 'Refresh')
 
 
