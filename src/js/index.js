@@ -215,7 +215,6 @@ const modalHandle = ( action, id, name ) => {
     return { open, close, validateModal };
 };
 
-
 // disabled all control-menu
 const disableAllMenu = () => controlButtons.forEach( btn => {
     attr( btn, 'data-type' ) !== 'explorer-up' && btn.classList.add( 'disabled' );
