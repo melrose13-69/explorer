@@ -50,6 +50,11 @@
     padding: rem(5);
     border-radius: rem(5);
     &-inner {
+      ex-name {
+        &.target {
+          color: $element2;
+        }
+      }
       ex-info {
         position: relative;
         z-index:  1;
@@ -59,11 +64,19 @@
             color: #55668e;
           }
         }
+        &.open {
+          ex-logo {
+            &::before {
+              content: '\e902';
+            }
+          }
+        }
       }
       ex-logo {
         position: relative;
         z-index: -1;
         margin-right: rem(5);
+
 
         &::before,
         &::after {
@@ -82,12 +95,19 @@ ex-content {
 }
 ex-folder {
   display: block;
+
   ex-logo {
     &::after {
       content: '\e909';
     }
     &::before {
       content: '\e903';
+    }
+
+    &.open {
+      &::after {
+        content: '\e902';
+      }
     }
   }
   ex-name {

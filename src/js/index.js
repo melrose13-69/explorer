@@ -8,6 +8,7 @@ const mainWrapper = body.querySelector( '#main_wrapper' );
 const controlsWrapper = body.querySelector( 'controls-wrapper' );
 const controlButtons = controlsWrapper.querySelectorAll( 'control-btn' );
 const modalBlock = body.querySelector( 'ex-modal' );
+const aside = body.querySelector( 'aside' );
 // const contextMenu = document.querySelector( 'context-menu' );
 //
 // // data[]
@@ -18,7 +19,7 @@ const list = [
         id: 1,
         type: 'folder',
         title: 'exportportal',
-        block: true,
+        block: false,
         password: '',
         created: '18.08.2021',
         children: [
@@ -144,10 +145,12 @@ const siblings = ( parent ) => {
     return false;
 };
 const getTargetElement = () => document.querySelector('ex-line.target');
+const getParentIdFromElement = (id) => id.substring(0, id.length - 1);
+const removeAsideTarget = () => aside.querySelectorAll('ex-name').forEach(elem => elem.classList.remove('target'));
 // functions
 // modalBlock
 
-const modalHandle = ( action, id, name ) => {
+const modalHandle = ( action, id, name, name2 ) => {
     const modalText = modalBlock.querySelector( '#ex-text' );
     const modalInput = modalBlock.querySelector( '#first-input' );
     const hiddenInput = modalBlock.querySelector( '#second-input' );
@@ -178,12 +181,12 @@ const modalHandle = ( action, id, name ) => {
         }
 
         if ( isDelete ) {
-            modalText.innerText = `Do you really wont to delete folder ?`;
+            modalText.innerText = `Do you really wont to delete ?`;
             attr( modalInput, 'type', 'hidden' );
             attr( hiddenInput, 'type', 'hidden' );
         }
         if ( isEdit ) {
-            modalText.innerText = `Do you really wont to rename this ${ action } ?`;
+            modalText.innerText = `Do you really wont to rename ${name.toUpperCase()} ?`;
             modalInput.value = name;
         }
 
@@ -198,34 +201,45 @@ const modalHandle = ( action, id, name ) => {
         const isError = ( input ) => {input.classList.add( 'error' );};
 
         if ( valFirst.length === 0 ) {
-            isError( modalInput );
+            // isError( modalInput );
             return false;
         }
 
-        if ( isFile ) {
+        if ( isFile) {
             if ( valFirst.indexOf( '.' ) < 0 ) {
-                isError( modalInput );
+                // isError( modalInput );
                 return false;
             }
 
-            if ( valFirst[ valFirst.indexOf( '.' ) + 1 ] !== undefined ) {
-                return true;
-            } else {
-                isError( modalInput );
-                return false;
-            }
+            return valFirst[ valFirst.indexOf( '.' ) + 1 ] !== undefined;
         }
+        if(isEdit) {
+            const currentElement = returnElemArrayIndexOfTheElementId(id).element;
+            if ( currentElement.type === 'file') {
+                if ( valFirst.indexOf( '.' ) < 0 ) {
+                    // isError( modalInput );
+                    return false;
+                }
 
-        if ( isFolder ) {
-            if ( valFirst.indexOf( '.' ) > 0 ) {
-                isError( modalInput );
-                return false;
-            } else {
-                return true;
+                return valFirst[ valFirst.indexOf( '.' ) + 1 ] !== undefined;
             }
+            if ( currentElement.type === 'folder' ) {
+                return valFirst.indexOf( '.' ) <= 0;
+            }
+
+        }
+        if ( isFolder ) {
+            return valFirst.indexOf( '.' ) <= 0;
         }
 
         if(isUnblock) {
+            const currentFolder = returnElemArrayIndexOfTheElementId(id).element;
+            const pass = currentFolder.password;
+            return pass === name;
+        }
+
+        if(isBlock) {
+            return name === name2;
         }
     };
 // close modalBlock
@@ -305,7 +319,7 @@ const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
         } );
     })();
 
-    if(listFiles.length === 0) return
+    if(listFiles.length === 0) return;
     listFiles.forEach( item => {
         const line = _( 'ex-line' );
         const logo = _( 'ex-logo' );
@@ -339,6 +353,7 @@ const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
         }
         disableAllMenu();
     } );
+    console.log( list );
 };
 // create aside explorer
 const createAsideList = ( parent = asideWrapper, array = list ) => {
@@ -424,12 +439,12 @@ const addIdToNewElement = folderFiles => {
     }
     return Math.max.apply( null, allId ) + 1;
 };
-// // change element title
-// const changeElementTitle = ( itemId, newTitle ) => {
-//     const currentItem = returnElemArrayIndexOfTheElementId( +itemId ).element;
-//     currentItem.title = newTitle;
-//     createAsideList();
-// };
+// change element title
+const changeElementTitle = ( itemId, newTitle ) => {
+    const currentItem = returnElemArrayIndexOfTheElementId( itemId ).element;
+    currentItem.title = newTitle;
+    createAsideList();
+};
 // // add new element in list[]
 const addNewElementInFolder = ( folderId, typeOfNewElem, titleOfNewElem ) => {
     const newItem = {};
@@ -455,14 +470,7 @@ const removeElement = ( elemId, array = list ) => {
 
     modalHandle().close();
 };
-const blockFolder = (folderId, pass) => {
-    const currentElement = returnElemArrayIndexOfTheElementId(folderId).element;
-    const encoder = new TextEncoder();
-    currentElement.password = encoder.encode(pass);
-    currentElement.block = true
-}
 
-const unblockFolder = ()
 // // open context menu
 // const showContextMenu = ( target, yPos, xPos, type ) => {
 //     const elementParent = target.parentNode;
@@ -508,6 +516,7 @@ mainWrapper.addEventListener( 'dblclick', ( e ) => {
     const t = e.target;
 
     if ( t.tagName === 'EX-LINE' ) {
+        removeAsideTarget()
         if ( attr( t, 'data-type' ) === 'folder' ) {
             createMainList( attr( t, 'data-id' ) );
             disableAllMenu();
@@ -533,6 +542,7 @@ controlsWrapper.addEventListener( 'click', ( e ) => {
         let id = attr( mainWrapper.children[ 0 ], 'data-id' );
         id = id.substring( 0, id.length - 2 );
         createMainList( id );
+        removeAsideTarget()
         return;
     }
 
@@ -561,11 +571,11 @@ modalBlock.querySelector( '#ex-cancel' ).addEventListener( 'click', modalHandle(
 modalBlock.querySelector( '#ex-save' ).addEventListener( 'click', function () {
     const type = attr( this, 'data-type' );
     const id = attr( this, 'data-id' );
-    if ( type === 'file' || type === 'folder' ) {
+    if ( type === 'file' || type === 'folder') {
         if ( modalHandle( type ).validateModal() ) {
             const name = modalBlock.querySelector( '#first-input' ).value;
-            addNewElementInFolder( id, type, name );
 
+            addNewElementInFolder( id, type, name );
             modalHandle().close();
         }
     }
@@ -573,13 +583,61 @@ modalBlock.querySelector( '#ex-save' ).addEventListener( 'click', function () {
         removeElement(id);
     }
 
+    if(type === 'edit') {
+        if ( modalHandle( type, id ).validateModal()) {
+            const name = modalBlock.querySelector( '#first-input' ).value;
+
+            changeElementTitle(id, name);
+            createMainList(getParentIdFromElement(id));
+            modalHandle().close();
+        }
+    }
     if(type === 'block') {
-        const pass = modalBlock.querySelector('#first-input').value;
-        blockFolder(id, pass);
-        modalHandle().close();
+        const pass1 = modalBlock.querySelector('#first-input').value;
+        const pass2 = modalBlock.querySelector('#second-input').value;
+        if(modalHandle(type, '', pass1, pass2).validateModal()) {
+            const currentElement = returnElemArrayIndexOfTheElementId(id).element;
+
+            currentElement.password = pass1;
+            currentElement.block = true;
+            createMainList(getParentIdFromElement(id));
+            modalHandle().close();
+        }
     }
 
+    if(type === 'unblock') {
+        const pass1 = modalBlock.querySelector('#first-input').value;
+
+        if(modalHandle(type, id, pass1).validateModal()) {
+            const currentElement = returnElemArrayIndexOfTheElementId(id).element;
+
+            currentElement.password = '';
+            currentElement.block = false;
+            createMainList(getParentIdFromElement(id));
+            modalHandle().close();
+        }
+    }
 } );
+
+aside.addEventListener('click', (e) => {
+   const t = e.target;
+
+   if(t.tagName === 'EX-INFO') {
+       t.classList.toggle('open')
+   }
+
+   if(t.tagName === 'EX-NAME') {
+       const id = attr(t.parentNode, 'data-id');
+       if(attr(t.parentNode, 'data-type') === 'file') {
+           createMainList(getParentIdFromElement(id));
+       } else {
+           createMainList(id);
+       }
+
+       removeAsideTarget();
+       t.classList.add('target');
+   }
+});
 //
 // // context menu click
 // contextMenu.addEventListener( 'click', ( e ) => {
