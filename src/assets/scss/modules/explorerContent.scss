@@ -41,6 +41,7 @@
     cursor: pointer;
     transition: all .4s;
     position: relative;
+    user-select: none;
     &::before {
       content: '';
       position: absolute;
