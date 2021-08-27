@@ -119,6 +119,15 @@ const list = [
         block: false,
         password: '',
         created: '18.08.2021'
+    },
+    {
+        id: 2,
+        type: 'folder',
+        title: 'folder22',
+        block: false,
+        password: '',
+        created: '18.08.2021',
+        children: []
     }
 ];
 // helpers
@@ -146,6 +155,17 @@ const siblings = ( parent ) => {
 const getTargetElement = () => document.querySelector( 'ex-line.target' );
 const getParentIdFromElement = ( id ) => id.substring( 0, id.length - 1 );
 const removeAsideTarget = () => aside.querySelectorAll( 'ex-name' ).forEach( elem => elem.classList.remove( 'target' ) );
+const notification = (type, text, timeout = 3000) => {
+    const noty = document.querySelector('.noty');
+    const notyText = noty.querySelector('.noty__text');
+    const removeClassList = () => noty.classList.remove(type, 'show');
+    notyText.innerText = text;
+    noty.classList.add(type, 'show');
+
+    setTimeout(() => {
+        noty.classList.remove(type, 'show');
+    }, timeout);
+}
 // functions
 // modalBlock
 
@@ -187,6 +207,7 @@ const modalHandle = ( action, id, name, name2 ) => {
         }
         if ( isEdit ) {
             modalText.innerText = `Do you really wont to rename ${name.toUpperCase()} ?`;
+            modalInput.type = 'text'
             modalInput.value = name;
         }
 
@@ -338,10 +359,16 @@ const typeOfDisableMenu = ( item, blockStatus ) => {
 // create main explorer
 const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
     const listFiles = [];
-    parent.innerHTML = '';
+
     if ( elemId ) array = returnElemArrayIndexOfTheElementId( elemId ).element.children;
 
+    if(array.length === 0) {
+        notification('warning', 'This folder is empty');
+        return;
+    }
+
     (function () {
+        parent.innerHTML = '';
         array.forEach( elem => {
             listFiles.push( elem );
         } );
@@ -357,7 +384,8 @@ const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
         } );
     })();
 
-    if ( listFiles.length === 0 ) return;
+
+
     listFiles.forEach( item => {
         const line = _( 'ex-line' );
         const logo = _( 'ex-logo' );
@@ -391,7 +419,6 @@ const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
         }
         disableAllMenu();
     } );
-    console.log( list );
 };
 // create aside explorer
 const createAsideList = ( parent = asideWrapper, array = list ) => {
@@ -504,7 +531,7 @@ const removeElement = ( elemId, array = list ) => {
     const currentElement = returnElemArrayIndexOfTheElementId( elemId );
     currentElement.array.splice( currentElement.index, 1 );
     createAsideList();
-    createMainList();
+    elemId.length > 1 ? createMainList(elemId.substring(0, elemId.length - 2)) : createMainList();
 
     modalHandle().close();
 };
@@ -595,6 +622,7 @@ modalBlock.querySelector( '#ex-save' ).addEventListener( 'click', function () {
 
             changeElementTitle( id, name );
             createMainList( getParentIdFromElement( id ) );
+
             modalHandle().close();
         }
     }

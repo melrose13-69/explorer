@@ -1,0 +1,32 @@
+.noty {
+  position: fixed;
+  top: rem(10);
+  left: 50%;
+  transform: translate(-50%, -150%);
+  color: #000;
+  padding: rem(10) rem(30);
+  transition: all .4s;
+  cursor: pointer;
+  box-shadow: 0 0 12px -5px #fff;
+  border-radius: 10px;
+  &.show {
+    transform: translate(-50%, 0);
+    transition: all .4s;
+  }
+  &.warning {
+    background-color: #def903;
+  }
+  &.success {
+    background-color: #04f104;
+  }
+  &.error {
+    background-color: #ff0707;
+    color: #fff;
+  }
+  &__inner {
+
+  }
+  &-text {
+
+  }
+}
