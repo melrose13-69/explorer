@@ -158,13 +158,33 @@ const removeAsideTarget = () => aside.querySelectorAll( 'ex-name' ).forEach( ele
 const notification = (type, text, timeout = 3000) => {
     const noty = document.querySelector('.noty');
     const notyText = noty.querySelector('.noty__text');
-    const removeClassList = () => noty.classList.remove(type, 'show');
+    const duration = noty.querySelector('.duration')
     notyText.innerText = text;
     noty.classList.add(type, 'show');
 
-    setTimeout(() => {
-        noty.classList.remove(type, 'show');
-    }, timeout);
+    const nativeSetTimeout = window.setTimeout;
+
+    window.bindTimeout = function (listener, interval) {
+        function setTimeout(code, delay) {
+            let elapsed = 0,
+                h;
+
+            h = window.setInterval(function () {
+                elapsed += interval;
+                if (elapsed < delay) {
+                    listener(((delay - elapsed) * 100 ) / delay);
+                } else {
+                    window.clearInterval(h);
+                }
+            }, interval);
+            return nativeSetTimeout(code, delay);
+        }
+
+        window.setTimeout = setTimeout;
+        setTimeout._native = nativeSetTimeout;
+    };
+    window.bindTimeout(function (t) {duration.style.width = `${t}%`}, 100);
+    window.setTimeout(function () {noty.classList.remove(type, 'show')}, 3000);
 }
 // functions
 // modalBlock
