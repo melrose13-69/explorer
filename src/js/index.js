@@ -9,6 +9,7 @@ const controlsWrapper = body.querySelector( 'controls-wrapper' );
 const controlButtons = controlsWrapper.querySelectorAll( 'control-btn' );
 const modalBlock = body.querySelector( 'ex-modal' );
 const aside = body.querySelector( 'aside' );
+const headerSearch = document.querySelector('.header__inner-search');
 // const contextMenu = document.querySelector( 'context-menu' );
 //
 // // data[]
@@ -551,6 +552,26 @@ const returnElemArrayIndexOfTheElementId = ( elemId ) => {
         return currentElement;
     }
 };
+const returnElementsForSearch = ( val ) => {
+    let elements = [];
+
+    const searchParentByElementId = ( value, currentArray ) => {
+        currentArray.forEach( item => {
+            if ( item.title.indexOf(value) > -1 ) {
+                elements.push(item)
+            }
+            if ( item.children && item.children.length > 0 ) {
+                searchParentByElementId( value, item.children );
+            }
+        } );
+    };
+
+    searchParentByElementId( val, list );
+
+    if ( elements.length > 0 ) {
+        return elements;
+    }
+};
 
 // functional for explorer
 // // add new element in the list[]
@@ -646,7 +667,7 @@ controlsWrapper.addEventListener( 'click', ( e ) => {
     }
 
     const activeElement = getTargetElement();
-    const targetName = activeElement.querySelector( 'ex-logo' ).innerText;
+
     const isControlButton = attr( t, 'data-type' ) === 'file'
         || attr( t, 'data-type' ) === 'folder'
         || attr( t, 'data-type' ) === 'delete'
@@ -655,6 +676,7 @@ controlsWrapper.addEventListener( 'click', ( e ) => {
         || attr( t, 'data-type' ) === 'edit';
 
     if ( isControlButton ) {
+        const targetName = activeElement.querySelector( 'ex-logo' ).innerText;
         modalHandle( attr( t, 'data-type' ), attr( activeElement, 'data-id' ), targetName ).open();
     }
 } );
@@ -745,56 +767,9 @@ aside.addEventListener( 'click', ( e ) => {
         t.classList.add( 'target' );
     }
 } );
-//
-// // context menu click
-// contextMenu.addEventListener( 'click', ( e ) => {
-//     const target = e.target;
-//     const tagName = target.tagName;
-//     const editElement = asideWrapper.querySelector( '.edit-mode' );
-//     const elementId = editElement.getAttribute( 'data-id' );
-//     const wrapperForRename = editElement.querySelector( '.title' );
-//     const wrapperForAdding = editElement.querySelector( 'ul' );
-//
-//     // rename file or folder
-//     if ( tagName === 'RENAME' ) {
-//         createRefactorBlock( wrapperForRename, wrapperForRename.innerText, 'rename-asideWrapper' );
-//     }
-//     // delete file or folder
-//     if ( tagName === 'DELETE' ) {
-//         createConfirmationBlock( target );
-//     }
-//     // delete confirmation
-//     if ( target.classList.contains( 'yes' ) ) {
-//         removeElement( elementId );
-//     }
-//     // add new file or folder
-//     if ( tagName === 'FILE' || tagName === 'FOLDER' ) {
-//         removeRefactorBlock();
-//         createRefactorBlock( wrapperForAdding, tagName, 'create-asideWrapper' );
-//     }
-// } );
-//
-// // close the elements when clicked outside of them
-// document.addEventListener( 'click', e => {
-//     const target = e.target;
-//     const isTitle = target.classList.contains( 'title' );
-//     const isControlWrapper = target === contextMenu;
-//     const isDeleteWrapper = target === contextMenu.querySelector( 'delete' );
-//     // close context menu
-//     if ( !isTitle && !isControlWrapper && !isDeleteWrapper ) {
-//         destroyContextMenu();
-//     }
-// } );
-//
-// // add custom context menu
-// asideWrapper.addEventListener( 'contextmenu', e => {
-//     const target = e.target;
-//     e.preventDefault();
-//
-//     if ( target.classList.contains( 'file__title' ) ) {
-//         showContextMenu( target, e.pageY, e.pageX, 'file' );
-//     }
-//     if ( target.classList.contains( 'folder__title' ) ) {
-//         showContextMenu( target, e.pageY, e.pageX, 'folder' );
-//     }
-// } );
+
+headerSearch.querySelector('button').addEventListener('click', function () {
+    const input = headerSearch.querySelector('#search');
+    const searchElements = returnElementsForSearch(input.value);
+    createMainList(null, mainWrapper, searchElements)
+});
