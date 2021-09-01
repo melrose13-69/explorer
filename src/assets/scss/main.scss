@@ -7,17 +7,17 @@
 
 html {
   line-height: $mainLineHeight;
-	font-size: $mainFontSize;
-	color: $mainFontColor;
+  font-size: $mainFontSize;
+  color: $mainFontColor;
   height: 100%;
   @media screen and (max-width: $desktopWidth) {
-		font-size: 18px;
+    font-size: 18px;
   }
   @media screen and (max-width: $tableWidth) {
-		font-size: 15px;
+    font-size: 15px;
   }
   @media screen and (max-width: $phoneWidth) {
-		font-size: 14px;
+    font-size: 14px;
   }
 }
 
@@ -25,14 +25,15 @@ body {
   margin: 0;
   padding: 0;
   font-family: $mainFont;
-	font-size: $mainFontSize;
+  font-size: $mainFontSize;
   font-weight: $mainFontWeight;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: $background;
-  
+
   &.lock {
     overflow: hidden;
+
     &::before {
       content: '';
       position: fixed;
@@ -46,6 +47,7 @@ body {
     }
   }
 }
+
 @keyframes bodyOpacityStart {
   0% {
     opacity: 0;
@@ -57,11 +59,17 @@ body {
 }
 
 
-*, *:before, *:after { box-sizing: border-box; }
+*, *:before, *:after {
+  box-sizing: border-box;
+}
 
-h1, h2, h3, h4, h5, h6 { margin: 0; }
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
 
-a { text-decoration: none; }
+a {
+  text-decoration: none;
+}
 
 ul, li {
   margin: 0;
@@ -96,10 +104,12 @@ section, .section {
   flex-direction: column;
   //min-height: 100vh;
 }
+
 .content {
   display: flex;
   justify-content: space-between;
 }
+
 .container {
   width: 100%;
   flex: 0 0 auto;
@@ -116,7 +126,12 @@ section, .section {
     max-width: $smPhoneWidth;
   }
 }
-
+.error-message {
+  font-size: 10px;
+  min-height: 20px;
+  display: block;
+  color: red;
+}
 // Modules
 // @import "modules/my-module.scss";
 @import './modules/header';
@@ -125,3 +140,5 @@ section, .section {
 @import './modules/explorerContent';
 @import "./modules/modal";
 @import "./modules/notification";
+
+@import "./media";

@@ -7,7 +7,9 @@
   background: $background;
   padding: rem(40) rem(60);
   border-radius: rem(20);
-  //display: none;
+  max-width: max-content;
+  min-width: rem(460);
+  width: 100%;
   transition: all .4s;
   &.active {
     //display: block;
@@ -25,12 +27,20 @@
         height: rem(40);
         border-radius: rem(10);
         padding-left: rem(20);
+        border: 2px solid transparent;
         &:not([type='hidden']) {
           margin-top: 10px;
         }
 
         &::placeholder {
           color: $element1;
+        }
+        &.error {
+          color: red;
+          border: 2px solid;
+          &::placeholder {
+            color: red;
+          }
         }
       }
     }

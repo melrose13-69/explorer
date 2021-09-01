@@ -121,7 +121,7 @@ const list = [
         created: '18.08.2021'
     },
     {
-        id: 2,
+        id: 3,
         type: 'folder',
         title: 'folder22',
         block: false,
@@ -152,47 +152,51 @@ const siblings = ( parent ) => {
 
     return false;
 };
+
 const getTargetElement = () => document.querySelector( 'ex-line.target' );
 const getParentIdFromElement = ( id ) => id.substring( 0, id.length - 1 );
 const removeAsideTarget = () => aside.querySelectorAll( 'ex-name' ).forEach( elem => elem.classList.remove( 'target' ) );
-const notification = (type, text, timeout = 3000) => {
-    const noty = document.querySelector('.noty');
-    const notyText = noty.querySelector('.noty__text');
-    const duration = noty.querySelector('.duration')
+
+const notification = ( type, text, timeout = 3000 ) => {
+    const noty = document.querySelector( '.noty' );
+    const notyText = noty.querySelector( '.noty__text' );
+    const duration = noty.querySelector( '.duration' );
     notyText.innerText = text;
-    noty.classList.add(type, 'show');
+    noty.classList.add( type, 'show' );
 
     const nativeSetTimeout = window.setTimeout;
 
-    window.bindTimeout = function (listener, interval) {
-        function setTimeout(code, delay) {
+    window.bindTimeout = function ( listener, interval ) {
+        function setTimeout( code, delay ) {
             let elapsed = 0,
                 h;
 
-            h = window.setInterval(function () {
+            h = window.setInterval( function () {
                 elapsed += interval;
-                if (elapsed < delay) {
-                    listener(((delay - elapsed) * 100 ) / delay);
+                if ( elapsed < delay ) {
+                    listener( ((delay - elapsed) * 100) / delay );
                 } else {
-                    window.clearInterval(h);
+                    window.clearInterval( h );
                 }
-            }, interval);
-            return nativeSetTimeout(code, delay);
+            }, interval );
+            return nativeSetTimeout( code, delay );
         }
 
         window.setTimeout = setTimeout;
         setTimeout._native = nativeSetTimeout;
     };
-    window.bindTimeout(function (t) {duration.style.width = `${t}%`}, 100);
-    window.setTimeout(function () {noty.classList.remove(type, 'show')}, 3000);
-}
+    window.bindTimeout( function ( t ) {duration.style.width = `${ t }%`;}, 100 );
+    window.setTimeout( function () {noty.classList.remove( type, 'show' );}, 3000 );
+};
 // functions
 // modalBlock
 
 const modalHandle = ( action, id, name, name2 ) => {
     const modalText = modalBlock.querySelector( '#ex-text' );
-    const modalInput = modalBlock.querySelector( '#first-input' );
-    const hiddenInput = modalBlock.querySelector( '#second-input' );
+    const inputWrapper = modalBlock.querySelector('.modal__inner-input');
+    const modalInput = inputWrapper.querySelector( '#first-input' );
+    const errorMessage = inputWrapper.querySelector( '.error-message' );
+    const hiddenInput = inputWrapper.querySelector( '#second-input' );
     const saveButton = modalBlock.querySelector( '#ex-save' );
     const isFile = action === 'file';
     const isFolder = action === 'folder';
@@ -206,61 +210,76 @@ const modalHandle = ( action, id, name, name2 ) => {
 
         if ( isFolder || isFile ) {
             modalText.innerText = `Write a new ${ action } name`;
+            modalInput.placeholder = `${action} name`
         }
 
         if ( isBlock ) {
-            modalText.innerText = `Enter the password to block the ${name.toUpperCase()}`;
+            modalText.innerText = `Enter the password to block the ${ name.toUpperCase() }`;
             attr( modalInput, 'type', 'password' );
             attr( hiddenInput, 'type', 'password' );
         }
 
         if ( isUnblock ) {
-            modalText.innerText = `Enter the password to unblock the ${name.toUpperCase()}`;
+            modalText.innerText = `Enter the password to unblock the ${ name.toUpperCase() }`;
             attr( modalInput, 'type', 'password' );
             attr( hiddenInput, 'type', 'hidden' );
         }
 
         if ( isDelete ) {
-            modalText.innerText = `Do you really wont to delete ${name.toUpperCase()} ?`;
+            modalText.innerText = `Do you really wont to delete ${ name.toUpperCase() } ?`;
             attr( modalInput, 'type', 'hidden' );
             attr( hiddenInput, 'type', 'hidden' );
         }
         if ( isEdit ) {
-            modalText.innerText = `Do you really wont to rename ${name.toUpperCase()} ?`;
-            modalInput.type = 'text'
+            modalText.innerText = `Do you really wont to rename ${ name.toUpperCase() } ?`;
+            modalInput.type = 'text';
             modalInput.value = name;
         }
 
         if ( isProtected ) {
-            modalText.innerText = `${name.toUpperCase()} is protected, please enter the password`;
+            modalText.innerText = `${ name.toUpperCase() } is protected, please enter the password`;
             attr( modalInput, 'type', 'password' );
             attr( hiddenInput, 'type', 'hidden' );
         }
 
         modalBlock.classList.add( 'active' );
         body.classList.add( 'lock' );
+        errorMessage.innerHTML = '';
         attr( saveButton, 'data-type', action );
         attr( saveButton, 'data-id', id );
     };
 
     const validateModal = () => {
             const valFirst = modalInput.value;
-            const isError = ( input ) => {input.classList.add( 'error' );};
+            const valSecond = hiddenInput.value;
 
-            if ( valFirst.length === 0 ) {
-                isError( modalInput );
+
+            const isError = ( input, text ) => {
+                errorMessage.innerHTML = text;
+                if(input === 'all') {
+                    modalInput.classList.add('error');
+                    hiddenInput.classList.add('error')
+                    return
+                }
+                input.classList.add( 'error' );
+            };
+
+            if ( valFirst.length < 3 && !isBlock && !isUnblock ) {
+                isError( modalInput, 'Name must contain 3 or more letters' );
                 return false;
             }
 
             if ( isFile ) {
+
                 if ( valFirst.indexOf( '.' ) < 0 ) {
-                    isError( modalInput );
+                    isError( modalInput, 'The file must have an extension (.*)' );
                     return false;
                 }
                 if ( valFirst[ valFirst.indexOf( '.' ) + 1 ] ) {
+                    notification('success', 'File added successfully')
                     return true;
                 } else {
-                    isError( modalInput );
+                    isError( modalInput, 'The file must have an extension (.*)' );
                     return false;
                 }
             }
@@ -268,22 +287,24 @@ const modalHandle = ( action, id, name, name2 ) => {
                 const currentElement = returnElemArrayIndexOfTheElementId( id ).element;
                 if ( currentElement.type === 'file' ) {
                     if ( valFirst.indexOf( '.' ) < 0 ) {
-                        isError( modalInput );
+                        isError( modalInput, 'The file must have an extension (.*)' );
                         return false;
-                    }
-                    if ( valFirst[ valFirst.indexOf( '.' ) + 1 ] ) {
-                        return true;
                     } else {
-                        isError( modalInput );
-                        return false;
+                        if ( valFirst[ valFirst.indexOf( '.' ) + 1 ] !== undefined ) {
+                            notification('success', 'File renamed successfully')
+                            return true;
+                        } else {
+                            isError( modalInput, 'The file must have an extension (.*)' );
+                            return false;
+                        }
                     }
-
                 }
                 if ( currentElement.type === 'folder' ) {
                     if ( valFirst.indexOf( '.' ) <= 0 ) {
+                        notification('success', 'Folder renamed successfully')
                         return true;
                     } else {
-                        isError( modalInput );
+                        isError( modalInput, 'The folder name must not contain special characters' );
                         return false;
                     }
                 }
@@ -291,36 +312,41 @@ const modalHandle = ( action, id, name, name2 ) => {
             }
             if ( isFolder ) {
                 if ( valFirst.indexOf( '.' ) <= 0 ) {
+                    notification('success', 'Folder added  hastily ')
                     return true;
                 } else {
-                    isError( modalInput );
+                    isError( modalInput, 'The folder name must not contain special characters' );
                     return false;
                 }
             }
 
-            if ( isUnblock || isProtected ) {
+            if ( isUnblock ) {
                 const currentFolder = returnElemArrayIndexOfTheElementId( id ).element;
                 const pass = currentFolder.password;
-                if(pass === name) {
-                    return true
+                if ( pass === name ) {
+                    notification('success', 'The folder is unlocked')
+                    return true;
                 } else {
-                    isError(modalInput);
-                    return false
+                    isError( modalInput, 'Wrong password' );
+                    return false;
                 }
             }
 
             if ( isBlock ) {
-                if(name === name2) {
-                    return true
-                } else {
-                    isError(modalInput);
-                    isError(hiddenInput);
+                if(name.length === 0 || name2.length === 0) {
+                    isError( 'all', 'Passwords must match' );
                     return false
+                }
+                if ( name === name2 ) {
+                    notification('success', 'The folder is locked')
+                    return true;
+                } else {
+                    isError( 'all', 'Passwords must match' );
+                    return false;
                 }
             }
 
-        }
-    ;
+        };
 // close modalBlock
     const close = () => {
         modalBlock.classList.remove( 'active' );
@@ -333,6 +359,18 @@ const modalHandle = ( action, id, name, name2 ) => {
         modalInput.value = '';
         hiddenInput.value = '';
     };
+    inputWrapper.querySelectorAll('input').forEach(input => {
+        input.addEventListener('keyup', function () {
+            const reg = /[а-яА-ЯёЁ]/g;
+            if (input.value.search(reg) !==  -1) {
+                input.value  =  input.value.replace(reg, '');
+            }
+
+            errorMessage.innerHTML = '';
+            input.classList.remove('error')
+        })
+    })
+
 
     return { open, close, validateModal };
 };
@@ -382,8 +420,8 @@ const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
 
     if ( elemId ) array = returnElemArrayIndexOfTheElementId( elemId ).element.children;
 
-    if(array.length === 0) {
-        notification('warning', 'This folder is empty');
+    if ( array.length === 0 ) {
+        notification( 'warning', 'This folder is empty' );
         return;
     }
 
@@ -403,7 +441,6 @@ const createMainList = ( elemId, parent = mainWrapper, array = list ) => {
             return 0;
         } );
     })();
-
 
 
     listFiles.forEach( item => {
@@ -551,7 +588,7 @@ const removeElement = ( elemId, array = list ) => {
     const currentElement = returnElemArrayIndexOfTheElementId( elemId );
     currentElement.array.splice( currentElement.index, 1 );
     createAsideList();
-    elemId.length > 1 ? createMainList(elemId.substring(0, elemId.length - 2)) : createMainList();
+    elemId.length > 1 ? createMainList( elemId.substring( 0, elemId.length - 2 ) ) : createMainList();
 
     modalHandle().close();
 };
@@ -570,6 +607,7 @@ mainWrapper.addEventListener( 'dblclick', ( e ) => {
     const t = e.target;
 
     if ( t.tagName === 'EX-LINE' ) {
+
         removeAsideTarget();
         if ( attr( t, 'data-type' ) === 'folder' ) {
             if ( attr( t, 'data-block' ) ) {
@@ -577,7 +615,9 @@ mainWrapper.addEventListener( 'dblclick', ( e ) => {
                 modalHandle( 'protected', attr( t, 'data-id' ), name ).open();
             } else {
                 createMainList( attr( t, 'data-id' ) );
-                disableAllMenu();
+                if ( !t.classList.contains( 'target' ) ) {
+                    disableAllMenu();
+                }
             }
         }
     }
@@ -691,7 +731,12 @@ aside.addEventListener( 'click', ( e ) => {
     if ( t.tagName === 'EX-NAME' ) {
         const id = attr( t.parentNode, 'data-id' );
         if ( attr( t.parentNode, 'data-type' ) === 'file' ) {
+            const fileName = t.innerText.trim();
             createMainList( getParentIdFromElement( id ) );
+            mainWrapper.querySelectorAll('ex-line').forEach(line => {
+                const text = line.querySelector('ex-logo').innerText.trim();
+                if(text === fileName) line.click()
+            })
         } else {
             createMainList( id );
         }
