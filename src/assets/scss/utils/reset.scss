@@ -17,7 +17,15 @@ time, mark, audio, video {
   font-size: 100%;
   vertical-align: baseline;
 }
-
+* {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    display: none;
+  }
+}
 // Links
 a {
   text-decoration: none;

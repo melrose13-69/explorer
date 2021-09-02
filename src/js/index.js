@@ -8,7 +8,6 @@ const mainWrapper = body.querySelector( '#main_wrapper' );
 const controlsWrapper = body.querySelector( 'controls-wrapper' );
 const controlButtons = controlsWrapper.querySelectorAll( 'control-btn' );
 const modalBlock = body.querySelector( 'ex-modal' );
-const aside = body.querySelector( 'aside' );
 const headerSearch = document.querySelector('.header__inner-search');
 // const contextMenu = document.querySelector( 'context-menu' );
 //
@@ -156,7 +155,7 @@ const siblings = ( parent ) => {
 
 const getTargetElement = () => document.querySelector( 'ex-line.target' );
 const getParentIdFromElement = ( id ) => id.substring( 0, id.length - 1 );
-const removeAsideTarget = () => aside.querySelectorAll( 'ex-name' ).forEach( elem => elem.classList.remove( 'target' ) );
+const removeAsideTarget = () => asideWrapper.querySelectorAll( 'ex-name' ).forEach( elem => elem.classList.remove( 'target' ) );
 
 const notification = ( type, text, timeout = 3000 ) => {
     const noty = document.querySelector( '.noty' );
@@ -615,12 +614,36 @@ const removeElement = ( elemId, array = list ) => {
 };
 
 asideWrapper.addEventListener( 'click', e => {
-    const target = e.target;
-    const parent = target.parentNode;
+    const t = e.target;
+    const parent = t.parentNode;
+    const content = parent.nextElementSibling;
+    const logo = parent.querySelector('ex-logo');
     // open folder
-    console.log( target.tagName );
-    if ( target.tagName === 'EX-INFO' && target.getAttribute( 'data-type' ) === 'folder' ) {
-        target.nextElementSibling.classList.toggle( 'open' );
+    if ( t.tagName === 'EX-LOGO' && attr( parent,'data-type' ) === 'folder' ) {
+        content.classList.toggle( 'open' );
+        t.classList.toggle('open')
+    }
+
+    if ( t.tagName === 'EX-NAME' ) {
+        const id = attr( t.parentNode, 'data-id' );
+        if ( attr( t.parentNode, 'data-type' ) === 'file' ) {
+            const fileName = t.innerText.trim();
+            createMainList( getParentIdFromElement( id ) );
+            mainWrapper.querySelectorAll('ex-line').forEach(line => {
+                const text = line.querySelector('ex-logo').innerText.trim();
+                if(text === fileName) line.click()
+            })
+        } else {
+            if(!content.classList.contains('open') || !logo.classList.contains('open')) {
+                content.classList.toggle( 'open' );
+                logo.classList.toggle('open');
+            }
+
+            createMainList( id );
+        }
+
+        removeAsideTarget();
+        t.classList.add( 'target' );
     }
 } );
 
@@ -657,8 +680,9 @@ mainWrapper.addEventListener( 'click', ( e ) => {
 
 controlsWrapper.addEventListener( 'click', ( e ) => {
     const t = e.target;
-
-    if ( attr( t, 'data-type' ) === 'explorer-up' && !t.classList.contains( 'disabled' ) ) {
+    const isExplorerUpButton = attr( t, 'data-type' ) === 'explorer-up';
+    const isDisabled = t.classList.contains( 'disabled' )
+    if ( isExplorerUpButton && !isDisabled ) {
         let id = attr( mainWrapper.children[ 0 ], 'data-id' );
         id = id.substring( 0, id.length - 2 );
         createMainList( id );
@@ -666,16 +690,8 @@ controlsWrapper.addEventListener( 'click', ( e ) => {
         return;
     }
 
-    const activeElement = getTargetElement();
-
-    const isControlButton = attr( t, 'data-type' ) === 'file'
-        || attr( t, 'data-type' ) === 'folder'
-        || attr( t, 'data-type' ) === 'delete'
-        || attr( t, 'data-type' ) === 'block'
-        || attr( t, 'data-type' ) === 'unblock'
-        || attr( t, 'data-type' ) === 'edit';
-
-    if ( isControlButton ) {
+    if ( !isExplorerUpButton && !isDisabled ) {
+        const activeElement = getTargetElement();
         const targetName = activeElement.querySelector( 'ex-logo' ).innerText;
         modalHandle( attr( t, 'data-type' ), attr( activeElement, 'data-id' ), targetName ).open();
     }
@@ -701,10 +717,8 @@ modalBlock.querySelector( '#ex-save' ).addEventListener( 'click', function () {
     if ( type === 'edit' ) {
         if ( modalHandle( type, id ).validateModal() ) {
             const name = modalBlock.querySelector( '#first-input' ).value;
-
             changeElementTitle( id, name );
             createMainList( getParentIdFromElement( id ) );
-
             modalHandle().close();
         }
     }
@@ -743,33 +757,30 @@ modalBlock.querySelector( '#ex-save' ).addEventListener( 'click', function () {
     }
 } );
 
-aside.addEventListener( 'click', ( e ) => {
-    const t = e.target;
-
-    if ( t.tagName === 'EX-INFO' ) {
-        t.classList.toggle( 'open' );
-    }
-
-    if ( t.tagName === 'EX-NAME' ) {
-        const id = attr( t.parentNode, 'data-id' );
-        if ( attr( t.parentNode, 'data-type' ) === 'file' ) {
-            const fileName = t.innerText.trim();
-            createMainList( getParentIdFromElement( id ) );
-            mainWrapper.querySelectorAll('ex-line').forEach(line => {
-                const text = line.querySelector('ex-logo').innerText.trim();
-                if(text === fileName) line.click()
-            })
-        } else {
-            createMainList( id );
-        }
-
-        removeAsideTarget();
-        t.classList.add( 'target' );
-    }
-} );
-
 headerSearch.querySelector('button').addEventListener('click', function () {
     const input = headerSearch.querySelector('#search');
     const searchElements = returnElementsForSearch(input.value);
     createMainList(null, mainWrapper, searchElements)
 });
+
+document.addEventListener('keyup', (e) => {
+   if(modalBlock.classList.contains('active')) {
+       if(e.key === 'Escape') {
+           modalHandle().close()
+       }
+       if(e.key === 'Enter') {
+           modalBlock.querySelector('#ex-save').click()
+       }
+   }
+});
+
+document.addEventListener('click', (e) => {
+    const t = e.target;
+    const isModal = modalBlock.contains(t) || t === modalBlock;
+    const modalIsActive = modalBlock.classList.contains('active');
+    const isBtn = t.tagName === 'CONTROL-BTN';
+
+    if(modalIsActive && !isModal && !isBtn) {
+        modalHandle().close()
+    }
+})
