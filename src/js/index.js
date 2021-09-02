@@ -8,7 +8,7 @@ const mainWrapper = body.querySelector( '#main_wrapper' );
 const controlsWrapper = body.querySelector( 'controls-wrapper' );
 const controlButtons = controlsWrapper.querySelectorAll( 'control-btn' );
 const modalBlock = body.querySelector( 'ex-modal' );
-const headerSearch = document.querySelector('.header__inner-search');
+const headerSearch = document.querySelector( '.header__inner-search' );
 // const contextMenu = document.querySelector( 'context-menu' );
 //
 // // data[]
@@ -193,7 +193,7 @@ const notification = ( type, text, timeout = 3000 ) => {
 
 const modalHandle = ( action, id, name, name2 ) => {
     const modalText = modalBlock.querySelector( '#ex-text' );
-    const inputWrapper = modalBlock.querySelector('.modal__inner-input');
+    const inputWrapper = modalBlock.querySelector( '.modal__inner-input' );
     const modalInput = inputWrapper.querySelector( '#first-input' );
     const errorMessage = inputWrapper.querySelector( '.error-message' );
     const hiddenInput = inputWrapper.querySelector( '#second-input' );
@@ -210,7 +210,7 @@ const modalHandle = ( action, id, name, name2 ) => {
 
         if ( isFolder || isFile ) {
             modalText.innerText = `Write a new ${ action } name`;
-            modalInput.placeholder = `${action} name`
+            modalInput.placeholder = `${ action } name`;
         }
 
         if ( isBlock ) {
@@ -250,69 +250,58 @@ const modalHandle = ( action, id, name, name2 ) => {
     };
 
     const validateModal = () => {
-            const valFirst = modalInput.value;
-            const valSecond = hiddenInput.value;
+        const valFirst = modalInput.value;
+        const valSecond = hiddenInput.value;
 
 
-            const isError = ( input, text ) => {
-                errorMessage.innerHTML = text;
-                if(input === 'all') {
-                    modalInput.classList.add('error');
-                    hiddenInput.classList.add('error')
-                    return
-                }
-                input.classList.add( 'error' );
-            };
+        const isError = ( input, text ) => {
+            errorMessage.innerHTML = text;
+            if ( input === 'all' ) {
+                modalInput.classList.add( 'error' );
+                hiddenInput.classList.add( 'error' );
+                return;
+            }
+            input.classList.add( 'error' );
+        };
 
-            if ( valFirst.length < 3 && !isBlock && !isUnblock ) {
-                isError( modalInput, 'Name must contain 3 or more letters' );
+        if ( valFirst.length < 3 && !isBlock && !isUnblock ) {
+            isError( modalInput, 'Name must contain 3 or more letters' );
+            return false;
+        }
+
+        if ( isFile ) {
+
+            if ( valFirst.indexOf( '.' ) < 0 ) {
+                isError( modalInput, 'The file must have an extension (.*)' );
                 return false;
             }
-
-            if ( isFile ) {
-
+            if ( valFirst[ valFirst.indexOf( '.' ) + 1 ] ) {
+                notification( 'success', 'File added successfully' );
+                return true;
+            } else {
+                isError( modalInput, 'The file must have an extension (.*)' );
+                return false;
+            }
+        }
+        if ( isEdit ) {
+            const currentElement = returnElemArrayIndexOfTheElementId( id ).element;
+            if ( currentElement.type === 'file' ) {
                 if ( valFirst.indexOf( '.' ) < 0 ) {
                     isError( modalInput, 'The file must have an extension (.*)' );
                     return false;
-                }
-                if ( valFirst[ valFirst.indexOf( '.' ) + 1 ] ) {
-                    notification('success', 'File added successfully')
-                    return true;
                 } else {
-                    isError( modalInput, 'The file must have an extension (.*)' );
-                    return false;
-                }
-            }
-            if ( isEdit ) {
-                const currentElement = returnElemArrayIndexOfTheElementId( id ).element;
-                if ( currentElement.type === 'file' ) {
-                    if ( valFirst.indexOf( '.' ) < 0 ) {
-                        isError( modalInput, 'The file must have an extension (.*)' );
-                        return false;
-                    } else {
-                        if ( valFirst[ valFirst.indexOf( '.' ) + 1 ] !== undefined ) {
-                            notification('success', 'File renamed successfully')
-                            return true;
-                        } else {
-                            isError( modalInput, 'The file must have an extension (.*)' );
-                            return false;
-                        }
-                    }
-                }
-                if ( currentElement.type === 'folder' ) {
-                    if ( valFirst.indexOf( '.' ) <= 0 ) {
-                        notification('success', 'Folder renamed successfully')
+                    if ( valFirst[ valFirst.indexOf( '.' ) + 1 ] !== undefined ) {
+                        notification( 'success', 'File renamed successfully' );
                         return true;
                     } else {
-                        isError( modalInput, 'The folder name must not contain special characters' );
+                        isError( modalInput, 'The file must have an extension (.*)' );
                         return false;
                     }
                 }
-
             }
-            if ( isFolder ) {
+            if ( currentElement.type === 'folder' ) {
                 if ( valFirst.indexOf( '.' ) <= 0 ) {
-                    notification('success', 'Folder added  hastily ')
+                    notification( 'success', 'Folder renamed successfully' );
                     return true;
                 } else {
                     isError( modalInput, 'The folder name must not contain special characters' );
@@ -320,33 +309,44 @@ const modalHandle = ( action, id, name, name2 ) => {
                 }
             }
 
-            if ( isUnblock ) {
-                const currentFolder = returnElemArrayIndexOfTheElementId( id ).element;
-                const pass = currentFolder.password;
-                if ( pass === name ) {
-                    notification('success', 'The folder is unlocked')
-                    return true;
-                } else {
-                    isError( modalInput, 'Wrong password' );
-                    return false;
-                }
+        }
+        if ( isFolder ) {
+            if ( valFirst.indexOf( '.' ) <= 0 ) {
+                notification( 'success', 'Folder added  hastily ' );
+                return true;
+            } else {
+                isError( modalInput, 'The folder name must not contain special characters' );
+                return false;
             }
+        }
 
-            if ( isBlock ) {
-                if(name.length === 0 || name2.length === 0) {
-                    isError( 'all', 'Passwords must match' );
-                    return false
-                }
-                if ( name === name2 ) {
-                    notification('success', 'The folder is locked')
-                    return true;
-                } else {
-                    isError( 'all', 'Passwords must match' );
-                    return false;
-                }
+        if ( isUnblock ) {
+            const currentFolder = returnElemArrayIndexOfTheElementId( id ).element;
+            const pass = currentFolder.password;
+            if ( pass === name ) {
+                notification( 'success', 'The folder is unlocked' );
+                return true;
+            } else {
+                isError( modalInput, 'Wrong password' );
+                return false;
             }
+        }
 
-        };
+        if ( isBlock ) {
+            if ( name.length === 0 || name2.length === 0 ) {
+                isError( 'all', 'Passwords must match' );
+                return false;
+            }
+            if ( name === name2 ) {
+                notification( 'success', 'The folder is locked' );
+                return true;
+            } else {
+                isError( 'all', 'Passwords must match' );
+                return false;
+            }
+        }
+
+    };
 // close modalBlock
     const close = () => {
         modalBlock.classList.remove( 'active' );
@@ -359,17 +359,17 @@ const modalHandle = ( action, id, name, name2 ) => {
         modalInput.value = '';
         hiddenInput.value = '';
     };
-    inputWrapper.querySelectorAll('input').forEach(input => {
-        input.addEventListener('keyup', function () {
+    inputWrapper.querySelectorAll( 'input' ).forEach( input => {
+        input.addEventListener( 'keyup', function () {
             const reg = /[а-яА-ЯёЁ]/g;
-            if (input.value.search(reg) !==  -1) {
-                input.value  =  input.value.replace(reg, '');
+            if ( input.value.search( reg ) !== -1 ) {
+                input.value = input.value.replace( reg, '' );
             }
 
             errorMessage.innerHTML = '';
-            input.classList.remove('error')
-        })
-    })
+            input.classList.remove( 'error' );
+        } );
+    } );
 
 
     return { open, close, validateModal };
@@ -556,8 +556,8 @@ const returnElementsForSearch = ( val ) => {
 
     const searchParentByElementId = ( value, currentArray ) => {
         currentArray.forEach( item => {
-            if ( item.title.indexOf(value) > -1 ) {
-                elements.push(item)
+            if ( item.title.indexOf( value ) > -1 ) {
+                elements.push( item );
             }
             if ( item.children && item.children.length > 0 ) {
                 searchParentByElementId( value, item.children );
@@ -617,11 +617,11 @@ asideWrapper.addEventListener( 'click', e => {
     const t = e.target;
     const parent = t.parentNode;
     const content = parent.nextElementSibling;
-    const logo = parent.querySelector('ex-logo');
+    const logo = parent.querySelector( 'ex-logo' );
     // open folder
-    if ( t.tagName === 'EX-LOGO' && attr( parent,'data-type' ) === 'folder' ) {
+    if ( t.tagName === 'EX-LOGO' && attr( parent, 'data-type' ) === 'folder' ) {
         content.classList.toggle( 'open' );
-        t.classList.toggle('open')
+        t.classList.toggle( 'open' );
     }
 
     if ( t.tagName === 'EX-NAME' ) {
@@ -629,14 +629,14 @@ asideWrapper.addEventListener( 'click', e => {
         if ( attr( t.parentNode, 'data-type' ) === 'file' ) {
             const fileName = t.innerText.trim();
             createMainList( getParentIdFromElement( id ) );
-            mainWrapper.querySelectorAll('ex-line').forEach(line => {
-                const text = line.querySelector('ex-logo').innerText.trim();
-                if(text === fileName) line.click()
-            })
+            mainWrapper.querySelectorAll( 'ex-line' ).forEach( line => {
+                const text = line.querySelector( 'ex-logo' ).innerText.trim();
+                if ( text === fileName ) line.click();
+            } );
         } else {
-            if(!content.classList.contains('open') || !logo.classList.contains('open')) {
+            if ( !content.classList.contains( 'open' ) || !logo.classList.contains( 'open' ) ) {
                 content.classList.toggle( 'open' );
-                logo.classList.toggle('open');
+                logo.classList.toggle( 'open' );
             }
 
             createMainList( id );
@@ -651,7 +651,7 @@ mainWrapper.addEventListener( 'dblclick', ( e ) => {
     const t = e.target;
 
     if ( t.tagName === 'EX-LINE' ) {
-
+        controlsWrapper.querySelector('[data-type="explorer-up"]').classList.remove('search')
         removeAsideTarget();
         if ( attr( t, 'data-type' ) === 'folder' ) {
             if ( attr( t, 'data-block' ) ) {
@@ -681,7 +681,11 @@ mainWrapper.addEventListener( 'click', ( e ) => {
 controlsWrapper.addEventListener( 'click', ( e ) => {
     const t = e.target;
     const isExplorerUpButton = attr( t, 'data-type' ) === 'explorer-up';
-    const isDisabled = t.classList.contains( 'disabled' )
+    const isDisabled = t.classList.contains( 'disabled' );
+    const isAfterSearch = t.classList.contains( 'search' );
+    if ( isAfterSearch ) {
+        createMainList();
+    }
     if ( isExplorerUpButton && !isDisabled ) {
         let id = attr( mainWrapper.children[ 0 ], 'data-id' );
         id = id.substring( 0, id.length - 2 );
@@ -757,30 +761,34 @@ modalBlock.querySelector( '#ex-save' ).addEventListener( 'click', function () {
     }
 } );
 
-headerSearch.querySelector('button').addEventListener('click', function () {
-    const input = headerSearch.querySelector('#search');
-    const searchElements = returnElementsForSearch(input.value);
-    createMainList(null, mainWrapper, searchElements)
-});
+headerSearch.querySelector( 'button' ).addEventListener( 'click', function () {
+    const input = headerSearch.querySelector( '#search' );
+    const searchElements = returnElementsForSearch( input.value );
+    if ( searchElements ) {
+        createMainList( null, mainWrapper, searchElements );
+        controlsWrapper.querySelector( '[data-type="explorer-up"]' ).classList.add( 'search' );
+    }
 
-document.addEventListener('keyup', (e) => {
-   if(modalBlock.classList.contains('active')) {
-       if(e.key === 'Escape') {
-           modalHandle().close()
-       }
-       if(e.key === 'Enter') {
-           modalBlock.querySelector('#ex-save').click()
-       }
-   }
-});
+} );
 
-document.addEventListener('click', (e) => {
+document.addEventListener( 'keyup', ( e ) => {
+    if ( modalBlock.classList.contains( 'active' ) ) {
+        if ( e.key === 'Escape' ) {
+            modalHandle().close();
+        }
+        if ( e.key === 'Enter' ) {
+            modalBlock.querySelector( '#ex-save' ).click();
+        }
+    }
+} );
+
+document.addEventListener( 'click', ( e ) => {
     const t = e.target;
-    const isModal = modalBlock.contains(t) || t === modalBlock;
-    const modalIsActive = modalBlock.classList.contains('active');
+    const isModal = modalBlock.contains( t ) || t === modalBlock;
+    const modalIsActive = modalBlock.classList.contains( 'active' );
     const isBtn = t.tagName === 'CONTROL-BTN';
 
-    if(modalIsActive && !isModal && !isBtn) {
-        modalHandle().close()
+    if ( modalIsActive && !isModal && !isBtn ) {
+        modalHandle().close();
     }
-})
+} );
