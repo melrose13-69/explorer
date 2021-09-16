@@ -17,7 +17,7 @@ const list = [
     {
         id: 1,
         type: 'folder',
-        title: 'exportportal',
+        title: 'mainFolder',
         block: false,
         password: '',
         created: '18.08.2021',
@@ -25,7 +25,7 @@ const list = [
             {
                 id: 11,
                 type: 'file',
-                title: 'index.html',
+                title: 'indexx.html',
                 block: false,
                 password: '',
                 created: '18.08.2021'
@@ -59,7 +59,7 @@ const list = [
                     {
                         id: 131,
                         type: 'file',
-                        title: 'app.js',
+                        title: 'appp.js',
                         block: false,
                         password: '',
                         created: '18.08.2021'
